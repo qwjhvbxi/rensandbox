@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=1200,initial-scale=1">
+	<title>Renewables sandbox</title>
+
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-141684549-1"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+	  gtag('config', 'UA-141684549-1');
+	</script>
+
+	<link rel="stylesheet" type="text/css" href="energystyle2.css">
+	<link rel="stylesheet" type="text/css" href="dygraph.css">
+	<link rel="stylesheet" type="text/css" href="Chart.min.css">
+	<link rel="icon" href="favicon.png">
+
+	<script type="text/javascript" src="general-functions.js"></script>
+	<script type="text/javascript" src="jquery-3.4.1.min.js"></script>
+	<script type="text/javascript" src="dygraph.min.js"></script>
+	<script type="text/javascript" src="synchronizer.js"></script>
+	<script type="text/javascript" src="papaparse.min.js"></script>
+	<script type="text/javascript" src="interaction-api.js"></script>
+	<script type="text/javascript" src="Chart.min.js"></script>
+	<script id="MathJax-script" async  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body onload="initializeEnergy();">
+
+<div id="container">
+
+	<div id="header">
+		<h1>Renewables sandbox</h1>
+		<div id="countryselector">
+			<select class="select-css" id="countryselect">
+				<option value="DE2015">Germany (2015)</option>
+				<option value="IT2019" disabled>Italy (2019)</option>
+				<option value="JP2019" disabled>Japan (2019)</option>
+			</select>
+		</div>
+	</div>
+
+	<div id="wrapper">
+		<div id="chartpanel">
+			<div id="resultsContainer2">
+				<div class="resultsHeader">
+					<div class="infoItem"></div>
+					<div class="infoNumbers">
+						<p>% of<br/>demand</p><p>Total<br/>(TWh)</p><p>Peak<br/>(GW)</p>
+					</div>
+				</div>
+				<div class="results" title="Load"></div>
+				<div class="results" title="Solar"></div>
+				<div class="results" title="Wind"></div>
+				<div class="results" title="Nuclear"></div>	
+				<div class="results" title="P2G"></div>
+				<div class="results" title="PHS"></div>
+				<div class="results" id="unservedbox" title="Unserved"></div>
+				<div class="results" title="Surplus"></div>
+				<hr/>
+				<div class="resultsCosts">
+					<div class='infoItem'>Cost/year:</div>
+					<div class="infoNumbers"> &euro; <span id="costperyear">...</span> billion </div>
+				</div>
+				<div class="resultsCosts">							
+					<div class='infoItem'>Cost per kWh:</div>
+					<span class='dot' id="costperkwhdot" style="background-color:#FF7F50"></span>
+					<div class="infoNumbers"> &euro; <span id="costperkwh">...</span></div>
+				</div>
+				<div class="Warn">Warning! Blackouts!</div>
+			</div>
+			<div id="graphsContainer">
+				<div id="plots" style="position:relative">
+					<div id="stackoption">
+						<label class="switch"><input type="checkbox" id="stackedopt"><span class="slider"></span></label><!-- stacked graph-->
+					</div>
+					<div id="mask"><img src="Pedro_luis_romani_ruiz.gif"/></div>
+					<div id="powerlabels"></div>
+					<div id="powerchart"><div id="loader">Loading data files...</div></div>
+					<div id="storage"><div id="loader">Loading data files...</div></div>
+				</div>
+			</div>
+		</div>
+		<div id="contentwrapper">
+			<div class="contentpanel" id="input">
+			
+				<table>
+					<td></td>
+					<td colspan=3><h2>Generation</h2></td>
+					<td colspan=4><h2>Storage</h2></td>
+					<tr/>
+					<th style="width:100px"></th>
+					<th>Solar</th>
+					<th>Wind</th>
+					<th>Nuclear</th>
+					<th colspan=2 class="leftborder"><abbr title="Pumped hydro storage"><a target="_blank" href="https://en.wikipedia.org/wiki/Pumped-storage_hydroelectricity">PHS</a></abbr></th>
+					<th colspan=2 class="leftborder"><abbr title="Power2gas"><a target="_blank" href="https://en.wikipedia.org/wiki/Power-to-gas">P2G</a></abbr></th>
+					
+					<tr/>
+					
+					<td>Installed capacity</td>
+					<td><div><span id="S1"></span> GW (<span id="S2"></span>%)</div>
+						<input class="ranges" title="S1" id="SolarPowerCapacity" type="range" min="0" max="500" step="1" value="" oninput="$('#S1').html( this.value );$('#S2').html( Math.round(this.value*SolarDemandPerc*10)/10 ) ">
+					</td>
+					<td><div><span id="W1"></span> GW (<span id="W2"></span>%)</div>
+						<input class="ranges" title="W1" id="WindPowerCapacity" type="range" min="0" max="500" step="1" value="" oninput="$('#W1').html( this.value );$('#W2').html( Math.round(this.value*WindDemandPerc*10)/10  ) ">
+					</td>
+					<td><div><span id="N1"></span> GW (<span id="N2"></span>%)</div>
+						<input class="ranges" title="N1" id="NuclearPowerCapacity" type="range" min="0" max="200" step="1" value="" oninput="$('#N1').html( this.value );$('#N2').html( Math.round(this.value*NuclearDemandPerc*10)/10 ) ">
+					</td>
+					<td class="leftborder">Power<div><span id="H1"></span> GW</div>
+						<input class="ranges" title="H1" id="PHSPowerCapacity" type="range" min="0" max="10" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td>Storage<div><span id="H2"></span> GWh</div>
+						<input class="ranges" title="H2" id="PHSStorageCapacity" type="range" min="0" max="50" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td class="leftborder">Power<div><span id="G1"></span> GW</div>
+						<input class="ranges" title="G1" id="P2GPowerCapacity" type="range" min="0" max="100" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td>Storage<div><span id="G2"></span> GWh</div>
+						<input class="ranges" title="G2" id="P2GStorageCapacity" type="range" min="0" max="100000" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					
+					<tr/>
+					
+					<td class="economic">Installation cost</td>
+					<td class="economic"><div><span id="S3"></span> $/kW</div>
+						<input class="ranges" title="S3" id="SolarCapitalCost" type="range" min="10" max="2000" step="10" value="" oninput="$('#S3').html( this.value );">
+					</td>
+					<td class="economic"><div><span id="W3"></span> $/kW</div>
+						<input class="ranges" title="W3" id="WindCapitalCost" type="range" min="100" max="5000" step="10" value="" oninput="$('#W3').html( this.value );">
+					</td>
+					<td class="economic"><div><span id="N3"></span> $/kW</div>
+						<input class="ranges" title="N3" id="NuclearCapitalCost" type="range" min="100" max="10000" step="10" value="" oninput="$('#N3').html( this.value );">
+					</td>
+					<td class="economic leftborder">Power<div><span id="H4"></span> $/kW</div>
+						<input class="ranges" title="H4" id="PHSCapitalCost" type="range" min="10" max="10000" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td class="economic">Storage<div><span id="H5"></span> $/kWh</div>
+						<input class="ranges" title="H5" id="PHSStorageCost" type="range" min="50" max="500" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td class="economic leftborder">Power<div><span id="G4"></span> $/kW</div>
+						<input class="ranges" title="G4" id="P2GCapitalCost" type="range" min="10" max="10000" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td class="economic">Storage<div><span id="G5"></span> $/kWh</div>
+						<input class="ranges" title="G5" id="P2GStorageCost" type="range" min="0" max="500" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					
+					<tr/>
+					
+					<td id="genchar">Generation <br/>characteristics</td>
+					<td class="economic">Variable cost<div><span id="S4"></span> $/kWh</div>
+						<input class="ranges" title="S4" id="SolarVariableCost" type="range" min="0" max="0.1" step="0.001" value="" oninput="$('#S4').html( this.value );">
+					</td>
+					<td class="economic">Variable cost<div><span id="W4">0.01</span> $/kWh</div>
+						<input class="ranges" title="W4" id="WindVariableCost" type="range" min="0" max="0.1" step="0.001" value="" oninput="$('#W4').html( this.value );">
+					</td>
+					<td class="economic">Variable cost<div><span id="N4"></span> $/kWh</div>
+						<input class="ranges" title="N4" id="NuclearVariableCost" type="range" min="0" max="0.2" step="0.001" value="" oninput="$('#N4').html( this.value );">
+					</td>
+					<td class="leftborder">Round-trip efficiency<div><span id="H3"></span>%</div>
+						<input class="ranges" title="H3" id="PHSEfficiency" type="range" min="1" max="100" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td></td>
+					<td class="leftborder">Round-trip efficiency<div><span id="G3"></span>%</div>
+						<input class="ranges" title="G3" id="P2GEfficiency" type="range" min="1" max="100" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td></td>
+					
+					<tr/>
+					
+					<td class="economic">Life span</td>
+					<td class="economic"><div><span id="S5"></span> years</div>
+						<input class="ranges" title="S5" id="SolarLifeSpan" type="range" min="10" max="40" step="1" value="" oninput="$('#S5').html( this.value );">
+					</td>
+					<td class="economic"><div><span id="W5"></span> years</div>
+						<input class="ranges" title="W5" id="WindLifeSpan" type="range" min="10" max="40" step="1" value="" oninput="$('#W5').html( this.value );">
+					</td>
+					<td class="economic"><div><span id="N5"></span> years</div>
+						<input class="ranges" title="N5" id="NuclearLifeSpan" type="range" min="20" max="100" step="1" value="" oninput="$('#N5').html( this.value );">
+					</td>
+					<td class="economic leftborder"><div><span id="H6"></span> years</div>
+						<input class="ranges" title="H6" id="PHSLifeSpan" type="range" min="10" max="100" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td class="economic"></td>
+					<td class="economic leftborder"><div><span id="G6"></span> years</div>
+						<input class="ranges" title="G6" id="P2GLifeSpan" type="range" min="5" max="50" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td class="economic"></td>
+				</table>
+				
+				<div id="advancedoption">
+					<div><label class="switch"><input type="checkbox" id="advancedcontroloption" onclick="toggleSimplified();" checked><span class="slider"></span></label> economic data controls</div>
+					<a id="runsim" href="#chartpanel" onclick="changeState(generateLoad)">Run simulation</a>
+				</div>
+				
+				<div id="submitContainer">
+					
+					<h2>Scenario manager</h2>
+					<div id="inputPresets"></div>
+					<input class='bottone' type="submit" value="save current scenario" onclick="displaySave()"/><input class='bottone' type="submit" value="reset to defaults" onclick="initializeCaps(-2)"/>
+					
+					<div id="savePane">
+						<input type="text" id="saveScenarioName" placeholder="scenario name"></input><input type="submit" onclick="saveScenario()" value="save"></input><input type="submit" onclick="$('#savePane').css('display','none');" value="close"></input>
+						<textarea id="saveScenarioComment" placeholder="Comments"></textarea>
+					</div>
+				</div>
+			</div>
+	
+			<div class="contentpanel" id="stats">
+				
+				<h2>Statistics</h2>
+				<div id="resultsContainer" class="flexpanel">
+					<div id="loaddurationContainer" class="smallerpanel">
+						<h3>Load duration curves</h3>
+						<br/>
+						<div id="loadDurationPlot"></div><div id="loadDurationPlotLabels"></div>
+					</div>
+					
+					<div id="energysourcesContainer" class="smallerpanel" >
+						<h3>How demand is met</h3>
+						<div id="energysourcesPlot">			
+						</div>
+					</div>
+				</div>
+				
+			</div>
+			
+			<div class="contentpanel" id="economics">
+				<div id="economicsContainer" class="smallcontainerafter">
+					
+				</div>
+			</div>
+			
+			<div class="contentpanel" id="details">
+				<h2>Model details</h2>
+				
+				<p>This app simulates the electricity system of the country in a very simplified way. In reality, there are many more issues to consider, such as transmission lines constraints, international exchanges, power ramping constraints, and the need for reserves in case of emergency (such as the failure of a power plant). </p>
+				<p>The generation from solar and wind is based on the actual generation in the country in that year. The generation is scaled by the installed capacity given in input. The generation from nuclear power at each time interval is calculated as:</p>
+				
+				$${P_{nuclear} = \max { ( 0, \min{ (Load -P_{solar}-P_{wind}+ P_{max,P2G}+P_{max,PHS}} , P_{installed,nuclear})} ) }$$
+				
+				$$P_{max,P2G}=\min{ (P_{installed,P2G}, S_{installed,P2G}-S_{P2G} ) }$$
+				
+				$$P_{max,PHS}=\min{ (P_{installed,PHS}, S_{installed,PHS}-S_{PHS} ) }$$
+				
+				<p>This ensures that the storage is always charged as much as possible.</p>
+				<p>Costs are intended as running cost, or the amount you would have to pay each year to keep the system running by replacing a fraction of the generating capacity equal to the inverse of the lifespan.</p>
+				<p>The purpose of this app is only to better understand the dynamics of renewable energy generation and storage at a country level.</p>
+			</div>
+		</div>
+	</div>
+
+	<div id="generalFooter">
+		Data from <a target="_blank" href="https://transparency.entsoe.eu/">ENTSO-E transparency platform</a> | Version <span id="VersionNo"></span> | &copy; 2020 <a target="_blank" href="http://riccardoiacobucci.com">Riccardo Iacobucci</a> 
+	</div>
+
+</div>
+
+</body>
+</html>

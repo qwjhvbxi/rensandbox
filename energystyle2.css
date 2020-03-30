@@ -1,0 +1,533 @@
+
+
+
+/*-------------------GENERAL & HEADER/FOOTER-------------------*/
+
+body {
+	font-family:helvetica,sans,arial;
+	/*overflow:hidden;*/
+	margin:0px;
+	font-size:10pt;
+	color:#666;
+	font-size:12pt;
+}
+#container {
+	width:1100px;
+	margin:auto;
+}
+#header {
+	padding:40px 0px 40px 0px;
+}
+h1 {
+	margin:0px;
+	padding:0px;
+	font-size:30pt;
+	font-weight:normal;
+	display:inline-block;
+	font-family:palatino, times;
+}
+#countryselector{
+	display:inline-block;
+	float:right;
+	font-size:14pt;
+	font-weight:bold;
+}
+#countryselect {
+	font-size:14pt;
+	font-weight:bold;
+}
+#generalFooter{
+	padding:10px;
+	font-size:12pt;
+	display:block;
+	background:#ccc;
+	margin-top:50px;
+}
+.dot {
+	height: 70px;
+	width: 70px;
+	background-color: #bbb;
+	border-radius: 50%;
+	display: inline-block;
+	z-index:90;
+}
+
+
+
+/*-------------------CONTENT STRUCTURE-------------------*/
+
+#contentwrapper { 
+	display:block;
+	position:relative;
+}
+
+
+
+/*-------------------CHARTS-------------------*/
+
+#chartpanel{
+	padding-top:20px;
+	display:flex;
+}
+#graphsContainer {
+	width:900px;
+	display:block;
+	position:relative;
+}
+#graphsContainer #stackoption {
+	position:absolute;
+	top:0px;
+	left:70px;
+	display:block;
+	z-index:100;
+}
+#powerchart {
+	height:300px;
+	background:white;
+	position:relative;
+}
+#powerlabels {
+	text-align:right;
+}
+#storage {
+	height:200px;
+	background:white;
+	position:relative;
+}
+#mask {
+	position:absolute;
+	background:white;
+	opacity:0.5;
+	color:black;
+	font-size:20pt;
+	font-weight:bold;
+	width:100%;
+	height:450px;
+	line-height:450px;
+	z-index:100;
+	text-align:center;
+	display:block;
+}
+#mask img {
+    vertical-align: middle;
+}
+#loader {
+	position:absolute;
+	width:100%;
+	top:50%;
+	font-size:10pt;
+	font-weight:bold;
+	text-align:center;
+	display:none;
+}
+#darkbg .dygraph-axis-label { color: white; }
+#darkbg .dygraph-legend { background-color: #101015; }
+
+
+
+/*-------------------INPUTS-------------------*/
+
+table {
+	font-size:10pt;
+	border-spacing: 0px;
+    border-collapse: separate;
+}
+td {
+	border-bottom:1px solid #ddd;
+	vertical-align:bottom;
+	padding:2px 5px 2px 5px;
+	
+}
+td.leftborder {
+	border-left:1px dotted #ddd;	
+}
+table div {
+	font-size:9pt;
+	font-family:monospace;
+	text-align:right;
+}
+a#runsim {
+	width:300px;
+	/*
+	margin-left:800px;
+	width:100%;
+	margin-top:20px;
+	*/
+	height:50px;
+	line-height:50px;
+	border:1px solid #ddd;
+	border-radius:3px;
+	transition:.2s;
+	text-align:center;
+	display:block;
+	text-decoration:none;
+	color:#666;
+	font-weight:bold;
+	background:#eee;
+}
+a#runsim:hover {
+	background:#7FFFD4;
+}
+#advancedoption {
+	margin-top:20px;
+	display:flex;
+	justify-content: space-between;
+}
+#advancedoption div {
+	height:20px;
+	margin:auto 0px auto 0px;
+}
+abbr a {
+	text-decoration:none;
+}
+
+
+
+/*-------------------CONTENT PANEL-------------------*/
+
+h2 {
+	color:#666;
+	padding:5px 0px 5px 0px;
+	border-bottom:2px solid #999;
+	font-weight:normal;
+	margin:0px;
+	font-size:17pt;/*14pt;*/
+	font-family:palatino;
+}
+h3{
+	font-size:12pt;
+	/*text-transform:uppercase;
+	border-top:1px solid #ccc;*/
+	margin:5px 0px 5px 0px;
+	font-weight:bold;
+	padding:0px;
+}
+p.description {
+	margin:0px 0px 15px 0px;
+	padding:0px;
+}
+.contentpanel { 
+	padding-top:15px;
+}
+.smallpanel {
+	padding-bottom:10px;
+}
+.flexpanel {
+	display:flex;
+	flex-wrap: wrap;
+	/*flex-direction:column;*/
+	justify-content: space-between; /*space-evenly*/
+}
+
+
+
+/*-------------  RESULTS ----------------*/
+
+#resultsContainer2 {
+	margin:0px 20px 0px -20px;
+}
+div.results,div.resultsHeader,div.resultsCosts {
+	position:relative;
+	width:200px;
+	padding:0px;
+	height:30px;
+	font-size:10pt;
+}
+div.resultsHeader {
+	height:70px;
+	margin-bottom:10px;
+}
+div.results span.dot,div.resultsCosts span.dot {
+	position:absolute;
+	left:60px;
+	top:-25px;
+	opacity:.2;
+}
+.infoItem {
+	text-align:right;
+	position:absolute;
+	width:70px;
+	font-weight:bold;
+	top:0px;
+	left:0px;
+}
+.infoNumbers {
+	position:absolute;
+	width:120px;
+	left:80px;
+	top:0px;
+	z-index:100;
+}
+.results p,.resultsHeader p {
+	margin:0px;
+	padding:0px;	
+	width:40px;
+	display:inline-block;
+	text-align:right;
+}
+.resultsHeader .infoNumbers {
+	height:50px;
+	margin-top:20px;
+}
+.resultsHeader p {
+	transform: rotate(-90deg);
+	text-align:left;
+	font-weight:bold;
+}
+.Warn { 
+	display:none;
+	color:#FF4500;
+	font-weight:bold;
+	font-size:12pt;
+	/*background:rgba(255,100,0,0.1);*/
+	background-color: #FF6347;
+	background-image: repeating-linear-gradient(45deg, transparent, transparent 30px, rgba(255,255,255,.6) 30px, rgba(255,255,255,.6) 60px);
+	color:white;
+	padding:10px;
+	text-align:center;
+	border-radius:5px;
+	margin:20px 0px 0px 0px;
+}
+.Alert .Warn {
+	display:block;
+}
+#unservedbox {
+	color:inherit;
+}
+.Alert #unservedbox {
+	color:red;
+}
+#resultsContainer p {
+	margin:5px 0px 2px 0px; 
+}
+
+
+
+/*-------------------SCENARIO MANAGER-------------------*/
+
+input.bottone {
+	background:white;
+	color:#666;
+	padding:15px;
+	margin:0px 5px 0px 0px;
+	border:1px solid #ddd;
+	min-width:100px;
+	display:inline-block;
+	-webkit-transition: .2s;
+	transition: .2s;
+	border-radius: 5px;
+	font-weight:bold;
+}
+input.bottone:hover {
+	background:#7FFFD4;
+}
+#inputPresets {
+	margin:10px 0px 15px 0px;
+}
+#inputPresets::before {
+	content:"Saved scenarios: ";
+	margin-right:20px;
+	display:block;
+	padding-bottom:5px;
+}
+input.scenariooptions {
+	color:#666;
+	padding:4px;
+	border:1px solid #ddd;
+	border-right:0px;
+	min-width:100px;
+	margin:0px 0px 0px 0px;
+	display:inline-block;
+	-webkit-transition:.2s;
+	transition:.2s;
+	border-radius:5px 0px 0px 5px;
+}
+input.scenariooptions:hover {
+	background:#7FFFD4;
+	/*background:#007;*/
+}
+input.deletescenariooption {	
+	background:black;
+	color:white;
+	margin:0px 5px 0px 0px;
+	padding:5px;
+	border:0px solid black;
+	min-width:20px;
+	transition:.2s;
+	border-radius:0px 5px 5px 0px;
+}
+input.deletescenariooption:hover {
+	background:red;
+}
+
+
+
+/*-------------------SAVE PANEL-------------------*/
+
+#savePane {
+	display:none;
+	position:relative;
+	padding:10px 0px 10px 0px;
+}
+#savePane input {
+	
+	color:#666;
+	padding:5px;
+	border:1px solid #ddd;
+	min-width:100px;
+	margin:5px 5px 5px 0px;
+	display:inline-block;
+	border-radius:3px;
+}
+#savePane textarea {
+	color:#666;
+	padding:5px;
+	border:1px solid #ddd;
+	width:100%;
+	display:block;
+	outline:none;
+	resize:none;
+	height:150px;
+	display:block;
+	margin:0px;
+	border-radius:3px;
+}
+
+
+
+/*-------------------STATISTICS-------------------*/
+
+#energysourcesContainer {
+	width:500px;
+	position:relative;
+}
+
+#loaddurationContainer {
+	
+}
+#loaddurationContainer div {
+	display:inline-block;
+	
+}
+#loadDurationPlotLabels{
+	height:200px;
+	vertical-align:top;
+	
+}
+#loadDurationPlot {
+	width:300px;
+	height:200px;
+}
+
+
+
+/*-------------------SWITCH-------------------*/
+
+/* The switch - the box around the slider */
+.switch {
+	position: relative;
+	display: inline-block;
+	width: 60px;
+	height: 20px;
+	margin:0px 5px 0px 0px;
+	
+}
+/* Hide default HTML checkbox */
+.switch input {
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+/* The slider */
+.slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #ccc;
+	-webkit-transition: .4s;
+	transition: .4s;
+	border-radius:3px;
+}
+.slider:before {
+	position: absolute;
+	content: "";
+	height: 12px;
+	width: 26px;
+	left: 4px;
+	bottom: 4px;
+	background-color: white;
+	-webkit-transition: .4s;
+	transition: .4s;
+}
+input:checked + .slider {
+	background-color: #000;
+}
+input:focus + .slider {
+	box-shadow: 0 0 1px #000;
+}
+input:checked + .slider:before {
+	-webkit-transform: translateX(26px);
+	-ms-transform: translateX(26px);
+	transform: translateX(26px);
+}
+.slider:after {
+	position:absolute;
+	left:70px;
+	width:200px;
+}
+input#stackedopt + .slider:after {
+	content:"stacked";
+}
+/*
+input#stackedopt + .slider:after {
+	content:"line chart";
+}
+input#stackedopt:checked + .slider:after {
+	content:"stacked areas";
+}
+*/
+
+
+
+/*-------------------SELECT-------------------*/
+
+.select-css {
+    display: block;
+    font-size: 14pt;
+    color: #666;
+    line-height: 1.3;
+    padding: .6em 1.4em .5em .8em;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: #fff;
+    outline:none;
+}
+.select-css::-ms-expand {
+    display: none;
+}
+.select-css:hover {
+    border-color: #888;
+}
+.select-css:focus {
+    border-color: #aaa;
+    box-shadow: 0 0 1px 3px rgba(59, 153, 252, .7);
+    box-shadow: 0 0 0 3px -moz-mac-focusring;
+    color: #222; 
+    outline: none;
+}
+.select-css option {
+    font-weight:normal;
+}
+
+
+
+
