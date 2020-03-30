@@ -685,8 +685,6 @@ function displayLoadDuration(data2,LabelIn,ColorsIn) {
 	
 	$('#loaddurationContainer').css('display','block');
 	
-	//data2=createLoadDuration(inputdata1);
-	
 	var Box=document.getElementById("loadDurationPlot");
 	var BoxLabel=document.getElementById("loadDurationPlotLabels");
 	gLoad=new Dygraph(
@@ -878,30 +876,6 @@ function downsample(data,num) {
 	
 }
 
-/*
-function simplifyVec(data,num) {
-	
-	if (data[0].length>1) {
-		var res=[];
-		var i;
-		for (let i=0;i<data.length;i++) {
-			res[i]=simplifyVec(data[i],num);
-		}
-	} else {
-		var j;
-		var res=[];
-		var tot=Math.ceil(data.length/num);
-		for (j=0;j<tot;j++) {
-			res[j]=data.splice(0,num).reduce(sumFun);
-		}
-	}
-	return res;
-}
-
-
-
-
-*/
 
 
 
