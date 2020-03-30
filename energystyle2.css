@@ -37,11 +37,11 @@ h1 {
 	font-weight:bold;
 }
 #generalFooter{
-	padding:10px;
+	padding:10px 0px 30px 0px;
 	font-size:12pt;
 	display:block;
-	background:#ccc;
 	margin-top:50px;
+	border-top:2px solid #ccc;
 }
 .dot {
 	height: 70px;
@@ -235,7 +235,16 @@ div.results,div.resultsHeader,div.resultsCosts {
 }
 div.resultsHeader {
 	height:70px;
-	margin-bottom:10px;
+	margin-bottom:0px;
+}
+.resultsHeader div {
+	transform: rotate(0deg);
+	text-align:left;
+	font-weight:normal;
+	position:absolute;
+	top:20px;
+	height:50px;
+	padding:0px;
 }
 div.results span.dot,div.resultsCosts span.dot {
 	position:absolute;
@@ -265,15 +274,7 @@ div.results span.dot,div.resultsCosts span.dot {
 	display:inline-block;
 	text-align:right;
 }
-.resultsHeader .infoNumbers {
-	height:50px;
-	margin-top:20px;
-}
-.resultsHeader p {
-	transform: rotate(-90deg);
-	text-align:left;
-	font-weight:bold;
-}
+
 .Warn { 
 	display:none;
 	color:#FF4500;
