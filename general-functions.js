@@ -586,13 +586,15 @@ function displayTutorial(n) {
 	} else {
 		$(".smallcontainer").addClass("smallcontainerafter").removeClass("smallcontainer");
 		
+		/*
 		var bottone=$("#replaytutorial");
 		var offset = bottone.offset();
 		var leftoff=Math.round(offset.left+bottone.width()/2)+'px';
 		$("#tutorialReminder").css({'left':leftoff,'display':'block','opacity':1});
 		setTimeout(function(){ $("#tutorialReminder").css('opacity','0'); }, 1000);
 		setTimeout(function(){ $("#tutorialReminder").css('display','none'); }, 5000);
-		
+		*/
+
 		//replaytutorial
 		//$(".tutorialSelected").addClass("smallcontainerafter").removeClass("tutorialSelected");
 		//$("#tutorials").css("display","none");
