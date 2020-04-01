@@ -81,6 +81,9 @@ h1 {
 	display:block;
 	z-index:100;
 }
+#plots {
+	visibility:hidden;
+}
 #powerchart {
 	height:300px;
 	background:white;
@@ -99,8 +102,6 @@ h1 {
 	background:white;
 	opacity:0.5;
 	color:black;
-	font-size:20pt;
-	font-weight:bold;
 	width:100%;
 	height:450px;
 	line-height:450px;
@@ -235,6 +236,7 @@ p.description {
 
 #resultsContainer2 {
 	margin:0px 20px 0px -20px;
+	visibility:hidden;
 }
 div.results,div.resultsHeader,div.resultsCosts {
 	position:relative;

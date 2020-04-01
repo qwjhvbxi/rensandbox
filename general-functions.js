@@ -400,6 +400,9 @@ function generateLoad() {
 		$("#resultsContainer2").removeClass("Alert");
 	}
 	
+	$("#plots").css({"visibility":"visible"});
+	$("#resultsContainer2").css({"visibility":"visible"});
+	
 	drawCharts();
 	displayPie();
 	
