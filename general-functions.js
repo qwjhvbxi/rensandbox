@@ -749,7 +749,7 @@ function legendFormatter(data) {
 	var seriesIndex = 0;
 	data.series.forEach(function(series) 
 	{
-		html += "<label><input type='checkbox' onclick=\"document.getElementById('"+dygraph.graphDiv.id+"').dygraph.setVisibility("+seriesIndex+", ";
+		html += "<label class='graph-checkbox-label'><input type='checkbox' onclick=\"document.getElementById('"+dygraph.graphDiv.id+"').dygraph.setVisibility("+seriesIndex+", ";
 		// nb: we have to use dygraph.visibility() here as series.isVisible has incorrect value for points where y value is undefined
 		if (dygraph.visibility()[seriesIndex]) { 
 			html += "false);\" checked>";
@@ -757,7 +757,7 @@ function legendFormatter(data) {
 			html += "true);\" >"; 
 		}
 		
-		var labeledData = "<span style='font-weight:bold;color:"+dygraph.getOption('colors')[seriesIndex]+"'>" + series.labelHTML + "</span>";
+		var labeledData = "<span class='graph-checkbox-span' style='font-weight:bold;color:"+dygraph.getOption('colors')[seriesIndex]+"'>" + series.labelHTML + "</span>";
 		
 		// workaround for the bug where Dygraph.prototype.setColors_ un-sets color for any series where visibility=false; 
 		// this workaround gives correct color if configured using options{colors:[...]} and falls back to transparent if not

@@ -213,6 +213,22 @@
 				</div>
 			</div>
 	
+			<div class="contentpanel flexpanel" id="stats">
+				
+				<div id="loaddurationContainer" class="smallerpanel" >
+					<h2>Load duration curves</h2>
+					<div id="loadDurationPlot"></div><div id="loadDurationPlotLabels"></div>
+					<p>The load duration plot shows the cumulative percentage of time a generating source has produced at or below a certain power level.</p>
+				</div>
+				
+				<div id="energysourcesContainer" class="smallerpanel" >
+					<h2>How demand is met</h2>
+					<div id="energysourcesPlot"></div>
+					<p>This plot shows how the demand is met. "Direct" means from generating sources directly without the use of storage.</p>
+				</div>
+				
+			</div>
+			<!--
 			<div class="contentpanel" id="stats">
 				
 				<h2>Statistics</h2>
@@ -231,6 +247,7 @@
 				</div>
 				
 			</div>
+			-->
 			
 			<div class="contentpanel" id="economics">
 				<div id="economicsContainer" class="smallcontainerafter">
@@ -258,7 +275,10 @@
 	</div>
 
 	<div id="generalFooter">
-		Data from <a target="_blank" href="https://transparency.entsoe.eu/">ENTSO-E transparency platform</a> | Version <span id="VersionNo"></span> | &copy; 2020 <a target="_blank" href="http://riccardoiacobucci.com">Riccardo Iacobucci</a> 
+		Data from <a target="_blank" href="https://transparency.entsoe.eu/">ENTSO-E transparency platform</a> 
+		| Version <span id="VersionNo"></span> 
+		| &copy; 2020 <a target="_blank" href="http://riccardoiacobucci.com">Riccardo Iacobucci</a> 
+		| <a target="_blank" href="https://github.com/qwjhvbxi/rensandbox/issues">Report an issue</a>
 	</div>
 
 </div>

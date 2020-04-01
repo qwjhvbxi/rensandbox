@@ -120,8 +120,18 @@ h1 {
 	text-align:center;
 	display:none;
 }
-#darkbg .dygraph-axis-label { color: white; }
-#darkbg .dygraph-legend { background-color: #101015; }
+#darkbg .dygraph-axis-label { 
+	color: white; 
+}
+#darkbg .dygraph-legend { 
+	background-color: #101015; 
+}
+.dygraph-ylabel, .dygraph-xlabel {
+	color:#999;
+	font-size:10pt;
+	-webkit-transform: translate3d( 0, 0, 0);
+}
+
 
 
 
@@ -248,7 +258,7 @@ div.resultsHeader {
 }
 div.results span.dot,div.resultsCosts span.dot {
 	position:absolute;
-	left:60px;
+	left:-20px;/*60px;*/
 	top:-25px;
 	opacity:.2;
 }
@@ -274,7 +284,6 @@ div.results span.dot,div.resultsCosts span.dot {
 	display:inline-block;
 	text-align:right;
 }
-
 .Warn { 
 	display:none;
 	color:#FF4500;
@@ -395,36 +404,54 @@ input.deletescenariooption:hover {
 }
 
 
+/*-------------------TUTORIAL-------------------*/
+.tutorialActive {
+	box-shadow: 0px 0px 500px 500px #ffffffa6;/*#0e80001f;*/
+    z-index: 110;
+}
+
+
 
 /*-------------------STATISTICS-------------------*/
 
-#energysourcesContainer {
-	width:500px;
-	position:relative;
-}
 
 #loaddurationContainer {
-	
+	width:540px;
 }
 #loaddurationContainer div {
 	display:inline-block;
-	
+}
+#loadDurationPlot {
+	margin:20px 0px 20px 0px;
+	height:250px;
 }
 #loadDurationPlotLabels{
 	height:200px;
 	vertical-align:top;
-	
+	margin:20px 0px 20px 0px;
 }
-#loadDurationPlot {
-	width:300px;
-	height:200px;
+#loadDurationPlotLabels input {
+	width:0px;
+	height:0px;
 }
-
+#energysourcesContainer {
+	width:540px;
+	position:relative;
+}
+#energysourcesPlot {
+	width:350px;
+	margin:20px 0px 20px 0px;
+}
+.graph-checkbox-span {
+	text-decoration:line-through;
+}
+.graph-checkbox-label input:checked ~ .graph-checkbox-span {
+	text-decoration:none;
+}
 
 
 /*-------------------SWITCH-------------------*/
 
-/* The switch - the box around the slider */
 .switch {
 	position: relative;
 	display: inline-block;
@@ -433,13 +460,11 @@ input.deletescenariooption:hover {
 	margin:0px 5px 0px 0px;
 	
 }
-/* Hide default HTML checkbox */
 .switch input {
 	opacity: 0;
 	width: 0;
 	height: 0;
 }
-/* The slider */
 .slider {
 	position: absolute;
 	cursor: pointer;
