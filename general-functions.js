@@ -402,13 +402,20 @@ function generateLoad() {
 	$("#plots").css({"visibility":"visible"});
 	$("#resultsContainer2").css({"visibility":"visible"});
 	
-	PowerData96=downsample(PowerData,24);
-	PowerData12=downsample(PowerData,8);
-	PowerDataStacked96=downsample(PowerDataStacked,24);
-	PowerDataStacked12=downsample(PowerDataStacked,8);
-	StorageData96=downsample(StorageData,24);
-	StorageData12=downsample(StorageData,8);
+	PowerData96=downsample(PowerData,96);
+	PowerData12=downsample(PowerData,12);
+	PowerDataStacked96=downsample(PowerDataStacked,96);
+	PowerDataStacked12=downsample(PowerDataStacked,12);
+	StorageData96=downsample(StorageData,96);
+	StorageData12=downsample(StorageData,12);
 		
+	
+	
+EpochStart=new Date("2015/01/01 00:00:00").getTime();
+EpochEnd=new Date("2016/01/01 00:00:00").getTime();
+EpochL=EpochEnd-EpochStart;
+SpliceL=PowerData96.length;
+	
 	
 	drawCharts();
 	displayPie();
@@ -484,29 +491,100 @@ function adaptRes2() {
 	
 }
 
+
 function adaptRes(minDate, maxDate, yRanges) {
 	
+	//console.log(maxDate-minDate)
 	var newData,newDataStacked,newDataStorage;
-	console.log(maxDate-minDate)
+	var st=g1.user_attrs_.stackedGraph;
 	
-	
-	if (maxDate-minDate>200*24*3600*1000) {
-		console.log('96');
-		newData=PowerData96;
-		newDataStacked=PowerDataStacked96;
+	if (st == true) {
+		baseData=PowerDataStacked96;
+	}else {
+		baseData=PowerData96;
+	}
+
+	if (maxDate-minDate>200*24*3600*1000) {	
+		//console.log('96');
+		newData=baseData;
 		newDataStorage=StorageData96;
 	} else {
 		if (maxDate-minDate>14*24*3600*1000) { 
-			console.log('12');
+			//console.log('12');
+			if (st == true) {
+				newData=PowerDataStacked12;
+			}else {
+				newData=PowerData12;
+			}
+			newDataStorage=StorageData96;
+		} else {
+			//console.log('1');
+			if (st == true) {
+				newData=PowerDataStacked;
+			}else {
+				newData=PowerData;
+			}
+			newDataStorage=StorageData;
+		}
+		
+		var VecL=newData.length;
+		var VecStart=Math.floor((minDate-EpochStart)/(EpochL)*VecL);
+		var VecEnd=Math.ceil((maxDate-EpochStart)/(EpochL)*VecL);
+		var spliceStart=Math.floor((minDate-EpochStart)/(EpochL)*SpliceL);
+		var spliceEnd=Math.ceil((maxDate-EpochStart)/(EpochL)*SpliceL);
+
+		var newclone = newData.slice();
+		var mezzo = newclone.splice(VecStart,VecEnd-VecStart);
+		
+		var spliceVec = baseData.slice();
+		var prima = spliceVec.splice(0, spliceStart);
+		var dopo = spliceVec.splice(spliceEnd-spliceStart);
+		/*
+		console.log(VecStart)
+		console.log(VecEnd)
+		
+		console.log(spliceStart)
+		console.log(spliceEnd)
+		
+		console.log(prima)
+		console.log(mezzo)
+		console.log(dopo)
+		*/
+		newData=prima.concat(mezzo,dopo);	
+		
+	}
+	
+	g1.updateOptions({'file': newData,});
+	g2.updateOptions({'file': newDataStorage,});
+	
+}
+
+
+function adaptResAlt(minDate, maxDate, yRanges) {
+	
+	var newData,newDataStacked,newDataStorage;
+	
+	if (maxDate-minDate>200*24*3600*1000) {	
+		
+		//console.log('96');
+		newData=PowerData96;
+		newDataStacked=PowerDataStacked96;
+		newDataStorage=StorageData96;
+				
+	} else {
+		
+		if (maxDate-minDate>14*24*3600*1000) { 
+			//console.log('12');
 			newData=PowerData12;
 			newDataStacked=PowerDataStacked12;
 			newDataStorage=StorageData12;
 		} else {
-			console.log('1');
+			//console.log('1');
 			newData=PowerData;
 			newDataStacked=PowerDataStacked;
 			newDataStorage=StorageData;
 		}
+		
 	}
 	
 	if (g1.user_attrs_.stackedGraph == true) {
@@ -564,6 +642,7 @@ function drawCharts() {
 		stackedGraph: true,
 		height: 200,
 		zoomCallback:adaptRes,
+		animatedZooms:true,
 		//rollPeriod: 14,
 		//showRoller: true,
 		/*
