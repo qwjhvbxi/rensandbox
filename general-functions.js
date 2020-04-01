@@ -5,14 +5,13 @@ ShowRangeSelector=false;
 Simplified=0;
 SolarCapInit=38;
 WindCapInit=40;
-
+FileName='data/GermanyData_2015.csv';
 
 
 
 
 function initializeEnergy() {
 
-	var FileName='data/GermanyData_2015.csv';
 	initializeCaps(-1);
 	$("#VersionNo").html(CurrentVersion);
 
@@ -403,6 +402,14 @@ function generateLoad() {
 	$("#plots").css({"visibility":"visible"});
 	$("#resultsContainer2").css({"visibility":"visible"});
 	
+	PowerData96=downsample(PowerData,24);
+	PowerData12=downsample(PowerData,8);
+	PowerDataStacked96=downsample(PowerDataStacked,24);
+	PowerDataStacked12=downsample(PowerDataStacked,8);
+	StorageData96=downsample(StorageData,24);
+	StorageData12=downsample(StorageData,8);
+		
+	
 	drawCharts();
 	displayPie();
 	
@@ -473,7 +480,44 @@ function displayPie() {
 }
 
 
+function adaptRes2() {
+	
+}
 
+function adaptRes(minDate, maxDate, yRanges) {
+	
+	var newData,newDataStacked,newDataStorage;
+	console.log(maxDate-minDate)
+	
+	
+	if (maxDate-minDate>200*24*3600*1000) {
+		console.log('96');
+		newData=PowerData96;
+		newDataStacked=PowerDataStacked96;
+		newDataStorage=StorageData96;
+	} else {
+		if (maxDate-minDate>14*24*3600*1000) { 
+			console.log('12');
+			newData=PowerData12;
+			newDataStacked=PowerDataStacked12;
+			newDataStorage=StorageData12;
+		} else {
+			console.log('1');
+			newData=PowerData;
+			newDataStacked=PowerDataStacked;
+			newDataStorage=StorageData;
+		}
+	}
+	
+	if (g1.user_attrs_.stackedGraph == true) {
+		g1.updateOptions({'file': newDataStacked,});
+	} else {
+		g1.updateOptions({'file': newData,});
+	}
+	g2.updateOptions({'file': newDataStorage,});
+	//*/
+	
+}
 
 function drawCharts() {
 
@@ -489,19 +533,22 @@ function drawCharts() {
 		stackedGraph: CapChoice.Options.Stacked,
 		height:250,//320,
 		labelsDiv:'powerlabels',
+		zoomCallback:adaptRes,
+		//drawCallback:adaptRes2,
+		animatedZooms:true,
 	};
 
 	if (CapChoice.Options.Stacked==false) {
 		options1.labels=PowerLabels;
 		options1.colors=PowerColors;
-		var g1=new Dygraph(target1,PowerData,options1);
+		g1=new Dygraph(target1,PowerData96,options1);
 	} else {
 		options1.labels=PowerStackedLabels;
 		options1.colors=PowerStackedColors;
-		var g1=new Dygraph(target1,PowerDataStacked,options1);//downsample(PowerDataStacked,16)
+		g1=new Dygraph(target1,PowerDataStacked96,options1);//downsample(PowerDataStacked,16)
 	}
 	
-	var g2=new Dygraph(
+	g2=new Dygraph(
 	  document.getElementById("storage"),
 	  StorageData,
 	  {
@@ -516,6 +563,7 @@ function drawCharts() {
 		maxNumberWidth: 20,
 		stackedGraph: true,
 		height: 200,
+		zoomCallback:adaptRes,
 		//rollPeriod: 14,
 		//showRoller: true,
 		/*
