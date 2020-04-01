@@ -326,9 +326,9 @@ function generateLoad() {
 		//PowerDataStacked[i][2]=Surplus[i];
 		PowerDataStacked[i][2]=p2gPowerGen[i];
 		PowerDataStacked[i][3]=phsPowerGen[i];
-		PowerDataStacked[i][4]=PowerData[i][1];
-		PowerDataStacked[i][5]=PowerData[i][2];
-		PowerDataStacked[i][6]=PowerData[i][3];
+		PowerDataStacked[i][4]=Solar[i];
+		PowerDataStacked[i][5]=Wind[i];
+		PowerDataStacked[i][6]=Nuclear[i];
 		
 		StorageLabels=[ "Date", "PHS storage", "P2G storage"];
 		StorageColors=[colorCodes.PHS,colorCodes.P2G];
