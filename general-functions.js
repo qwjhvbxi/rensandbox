@@ -1,13 +1,23 @@
 
 // general info
 CurrentVersion=0.13;
-ShowRangeSelector=false;
+ShowRangeSelector=true;
 Simplified=0;
 SolarCapInit=38;
 WindCapInit=40;
 FileName='data/GermanyData_2015.csv';
-
-
+colorCodes={
+	Solar:"#aaaa00",
+	Wind:"#00aa33",
+	Nuclear:"#FF7F00",
+	Coal:"#630",
+	PHS:"#6677ff",
+	P2G:"#456789",
+	Direct:"#00FA9A",
+	Load:"#333",
+	Unserved:"#ff0000",
+	Surplus:"#9cc",
+}
 
 
 function initializeEnergy() {
@@ -44,7 +54,6 @@ function updateRanges() {
 	$('#N2').html( Math.round($("#NuclearPowerCapacity").val()*NuclearDemandPerc*10)/10 )
 	
 }
-
 
 function initializeCaps(resetOption) {
 	
@@ -159,9 +168,7 @@ function writeOptions() {
 }
 
 function displaySave() {
-	
 	$('#savePane').css('display','block');
-	
 }	
 
 function saveScenario() {
@@ -209,36 +216,16 @@ function adjustheight() {
 }
 //window.addEventListener("resize", adjustheight);
 
-
-colorCodes={
-	Solar:"#aaaa00",
-	Wind:"#00aa33",
-	Nuclear:"#FF7F00",
-	Coal:"#630",
-	PHS:"#6677ff",
-	P2G:"#456789",
-	Direct:"#00FA9A",
-	Load:"#333",
-	Unserved:"#ff0000",
-	Surplus:"#9cc",
-}
-
-
 function changeState(callback) {
-		
 	showMask2();
 	setTimeout(callback, 50);
-
 }
-
 
 function showMask2() {	
 	$("#mask").css("display","block");
 }
 
-
 function generateLoad() {
-	
 	
 	readOptions()
 	ThisData=EnergyData.data;
@@ -409,13 +396,10 @@ function generateLoad() {
 	StorageData96=downsample(StorageData,96);
 	StorageData12=downsample(StorageData,12);
 		
-	
-	
-EpochStart=new Date("2015/01/01 00:00:00").getTime();
-EpochEnd=new Date("2016/01/01 00:00:00").getTime();
-EpochL=EpochEnd-EpochStart;
-SpliceL=PowerData96.length;
-	
+	EpochStart=new Date("2015/01/01 00:00:00").getTime();
+	EpochEnd=new Date("2016/01/01 00:00:00").getTime();
+	EpochL=EpochEnd-EpochStart;
+	SpliceL=PowerData96.length;
 	
 	drawCharts();
 	displayPie();
@@ -424,75 +408,13 @@ SpliceL=PowerData96.length;
 	
 }
 
-function displayPie() {
-	
-	$('#energysourcesContainer').css('display','block');
-	
-	document.getElementById("energysourcesPlot").innerHTML = '';
-	$('#energysourcesPlot').append($(document.createElement('canvas')).attr('id', 'energysources'));
-	
-	var i;
-	var ServedDirectly=[];
-	var ServedWithPHS=[];
-	var ServedWithP2G=[];
-	for (i=1;i<Generation.length;i++) {
-		ServedDirectly[i]=Math.min(Generation[i],Load[i]);
-		ServedWithP2G[i]=Math.max(0,p2gPower[i]);
-		ServedWithPHS[i]=Math.max(0,phsPower[i]);
-	}
-	var data1=[
-		Math.round(ServedDirectly.reduce(sumFun)/4/1000*10)/10,
-		Math.round(ServedWithPHS.reduce(sumFun)/4/1000*10)/10,
-		Math.round(ServedWithP2G.reduce(sumFun)/4/1000*10)/10,
-		Math.round(Unserved.reduce(sumFun)/4/1000*10)/10
-	];
-					
-	var totale=data1.reduce(sumFun);
-	
-	var ctx = document.getElementById('energysources').getContext('2d');
-	var chart = new Chart(ctx, {
-		type: 'pie',
-		data: {
-			datasets: [{
-				data: data1,
-				backgroundColor: [
-					colorCodes.Direct,
-					colorCodes.PHS,
-					colorCodes.P2G,
-					colorCodes.Unserved
-				],
-				label: 'Dataset 1'
-			}],
-			labels: [
-				'Direct ('+(Math.round(data1[0]/totale*1000)/10)+'%)',
-				'PHS ('+(Math.round(data1[1]/totale*1000)/10)+'%)',
-				'P2G ('+(Math.round(data1[2]/totale*1000)/10)+'%)',
-				'Unserved ('+(Math.round(data1[3]/totale*1000)/10)+'%)'
-			]
-		},
-		options: {
-			responsive: true,
-			legend: {position: 'right'},
-			tooltips: {
-                enabled: true,
-                mode: 'single',
-                callbacks: {
-                    label: function(tooltipItems, data) { 
-						return data1[tooltipItems.index] + ' TWh';
-                    }
-                }
-            },
-		}
-	});
-}
-
-
-function adaptRes2() {
-	
-}
-
 
 function adaptRes(minDate, maxDate, yRanges) {
+	
+	if (maxDate===undefined) {
+		minDate=g1.dateWindow_[0];
+		maxDate=g1.dateWindow_[1];
+	}
 	
 	//console.log(maxDate-minDate)
 	var newData,newDataStacked,newDataStorage;
@@ -542,16 +464,13 @@ function adaptRes(minDate, maxDate, yRanges) {
 		/*
 		console.log(VecStart)
 		console.log(VecEnd)
-		
 		console.log(spliceStart)
 		console.log(spliceEnd)
-		
 		console.log(prima)
 		console.log(mezzo)
 		console.log(dopo)
 		*/
 		newData=prima.concat(mezzo,dopo);	
-		
 	}
 	
 	g1.updateOptions({'file': newData,});
@@ -559,8 +478,8 @@ function adaptRes(minDate, maxDate, yRanges) {
 	
 }
 
-
 function adaptResAlt(minDate, maxDate, yRanges) {
+	
 	
 	var newData,newDataStacked,newDataStorage;
 	
@@ -604,7 +523,7 @@ function drawCharts() {
 		title: '',
 		ylabel: 'Power (GW)',
 		legend: 'always',
-		showRangeSelector: ShowRangeSelector,
+		showRangeSelector: false,
 		interactionModel: Dygraph.defaultInteractionModel,
 		rangeSelectorHeight: 30,
 		maxNumberWidth: 20,
@@ -634,7 +553,7 @@ function drawCharts() {
 		title: '',
 		ylabel: 'Energy (GWh)',
 		legend: 'always',
-		showRangeSelector: false,
+		showRangeSelector: ShowRangeSelector,
 		rangeSelectorHeight: 30,
 		labels: StorageLabels,
 		colors: StorageColors,
@@ -642,7 +561,7 @@ function drawCharts() {
 		stackedGraph: true,
 		height: 200,
 		zoomCallback:adaptRes,
-		animatedZooms:true,
+		animatedZooms:false,
 		//rollPeriod: 14,
 		//showRoller: true,
 		/*
@@ -658,124 +577,24 @@ function drawCharts() {
 	}
 	);
 	var sync = Dygraph.synchronize(g1, g2,{
-       selection: true,
-       zoom: true,
-	   range: false
- });
+		selection: true,
+		zoom: true,
+		range: false
+	});
  
- $("#mask").css("display","none");
-	
+	$("#mask").css("display","none");
+	$(".dygraph-rangesel-fgcanvas").mousedown(function(){attivato=1});
 }
 
-
-function displayTutorial(n) {
-
-	updateTabs(0);
-
-	$('#savePane').css("display","none");
-	var c = $("#tutorials div");
-	c.css("display","none");
-	$(".tutorialSelected").addClass("smallcontainerafter").removeClass("tutorialSelected");
-
-	if (c[n]) {
-		$(".smallcontainerafter").addClass("smallcontainer").removeClass("smallcontainerafter");
-		var Block=c[n];
-		Block.style.display="block";
-		
-		var Subje=document.getElementById(Block.title);
-		if (Subje) {
-			var SPos=Subje.getBoundingClientRect();
-			var w=window.innerWidth;
-			var h=window.innerHeight;
-			
-			// quadrants check
-			if (SPos.left+SPos.right>w) {
-				
-				if (SPos.top+SPos.bottom>h) {
-					Block.style.top=SPos.top+"px";
-					Block.style.left=SPos.left-530+"px";
-				} else {
-					Block.style.left=SPos.left+"px";
-					Block.style.top=SPos.bottom+"px";
-				}
-			} else {
-				Block.style.left=SPos.right+"px";
-				Block.style.top=SPos.top+"px";
-			}
-			Subje.className="tutorialSelected";	
-		}
-		
-		if ($(Block).find("span").length==0) {
-		var Prev=$('<span>back</span>').click(function(){displayTutorial(n-1);});
-		var Clos=$('<span>exit</span>').click(function(){displayTutorial(-1);});
-		var Next=$('<span>next</span>').click(function(){displayTutorial(n+1);});
-		//Block.addEventListener("click",function() {displayTutorial(n+1);});
-		Block.append(Prev[0],Clos[0],Next[0]);
-		}
-		
-	} else {
-		$(".smallcontainer").addClass("smallcontainerafter").removeClass("smallcontainer");
-		
-		/*
-		var bottone=$("#replaytutorial");
-		var offset = bottone.offset();
-		var leftoff=Math.round(offset.left+bottone.width()/2)+'px';
-		$("#tutorialReminder").css({'left':leftoff,'display':'block','opacity':1});
-		setTimeout(function(){ $("#tutorialReminder").css('opacity','0'); }, 1000);
-		setTimeout(function(){ $("#tutorialReminder").css('display','none'); }, 5000);
-		*/
-
-		//replaytutorial
-		//$(".tutorialSelected").addClass("smallcontainerafter").removeClass("tutorialSelected");
-		//$("#tutorials").css("display","none");
+attivato=0;
+$(this).mouseup(checkPointer);
+function checkPointer(){
+	if (attivato==1) {
+		adaptRes();
+		attivato=0;
 	}
-
-	return null;
-
 }
 
-
-function get(url) {
-	
-	// Return a new promise.
-	return new Promise(function(resolve, reject) {
-		// Do the usual XHR stuff
-		var req = new XMLHttpRequest();
-		req.open('GET', url);
-		req.onload = function() {
-		  // This is called even on 404 etc
-		  // so check the status
-			if (req.status == 200) {
-				// Resolve the promise with the response text
-				EnergyData = Papa.parse(req.response ,{
-					header: false,
-					dynamicTyping: true
-					}
-					);
-					
-				EnergyData.data.splice(0,1);
-				
-				for (i=0;i<EnergyData.data.length;i++) {
-					EnergyData.data[i][0]=new Date(EnergyData.data[i][0]);
-				}
-				resolve(EnergyData.data);
-			
-				//resolve(req.response);
-			} else {
-				// Otherwise reject with the status text
-				// which will hopefully be a meaningful error
-				reject(Error(req.statusText));
-			}
-		};
-
-		// Handle network errors
-		req.onerror = function() {
-			reject(Error("Network Error"));
-		};
-		// Make the request
-		req.send();
-  });
-}
 
 function createLoadDuration(data,LabelIn,ColorsIn) {
 	
@@ -848,16 +667,6 @@ function displayLoadDuration(data2,LabelIn,ColorsIn) {
 	
 }
 
-function toggleSimplified() {
-	Simplified=1-Simplified;
-	if (Simplified==0) {
-		$(".economic").css({display:"table-cell"});
-		$("#genchar").attr('colspan',1);
-	} else {
-		$(".economic").css({display:"none"});
-		$("#genchar").attr('colspan',4);
-	}
-}
 
 function legendFormatter(data) {
 	
@@ -906,23 +715,77 @@ function legendFormatter(data) {
 	return html;
 }
 
-
-function histogram(data, size) {
-    var length = data.length;
-    var min = Math.min.apply(null,data);
-    var max = Math.max.apply(null,data);
-    var bins = Math.ceil((max - min + 1) / size);
-    var histogram = [];
+function displayPie() {
 	
-    for (var i = 0; i < bins; i++) {
-		histogram[i] = [];
-		histogram[i][0] = min+i*size;
-		histogram[i][1] = 0;
+	$('#energysourcesContainer').css('display','block');
+	
+	document.getElementById("energysourcesPlot").innerHTML = '';
+	$('#energysourcesPlot').append($(document.createElement('canvas')).attr('id', 'energysources'));
+	
+	var i;
+	var ServedDirectly=[];
+	var ServedWithPHS=[];
+	var ServedWithP2G=[];
+	for (i=1;i<Generation.length;i++) {
+		ServedDirectly[i]=Math.min(Generation[i],Load[i]);
+		ServedWithP2G[i]=Math.max(0,p2gPower[i]);
+		ServedWithPHS[i]=Math.max(0,phsPower[i]);
 	}
-    for (var i = 0; i < length; i++) {
-        histogram[Math.floor((data[i] - min) / size)][1]++;
+	var data1=[
+		Math.round(ServedDirectly.reduce(sumFun)/4/1000*10)/10,
+		Math.round(ServedWithPHS.reduce(sumFun)/4/1000*10)/10,
+		Math.round(ServedWithP2G.reduce(sumFun)/4/1000*10)/10,
+		Math.round(Unserved.reduce(sumFun)/4/1000*10)/10
+	];
+					
+	var totale=data1.reduce(sumFun);
+	
+	var ctx = document.getElementById('energysources').getContext('2d');
+	var chart = new Chart(ctx, {
+		type: 'pie',
+		data: {
+			datasets: [{
+				data: data1,
+				backgroundColor: [
+					colorCodes.Direct,
+					colorCodes.PHS,
+					colorCodes.P2G,
+					colorCodes.Unserved
+				],
+				label: 'Dataset 1'
+			}],
+			labels: [
+				'Direct ('+(Math.round(data1[0]/totale*1000)/10)+'%)',
+				'PHS ('+(Math.round(data1[1]/totale*1000)/10)+'%)',
+				'P2G ('+(Math.round(data1[2]/totale*1000)/10)+'%)',
+				'Unserved ('+(Math.round(data1[3]/totale*1000)/10)+'%)'
+			]
+		},
+		options: {
+			responsive: true,
+			legend: {position: 'right'},
+			tooltips: {
+                enabled: true,
+                mode: 'single',
+                callbacks: {
+                    label: function(tooltipItems, data) { 
+						return data1[tooltipItems.index] + ' TWh';
+                    }
+                }
+            },
+		}
+	});
+}
+
+function toggleSimplified() {
+	Simplified=1-Simplified;
+	if (Simplified==0) {
+		$(".economic").css({display:"table-cell"});
+		$("#genchar").attr('colspan',1);
+	} else {
+		$(".economic").css({display:"none"});
+		$("#genchar").attr('colspan',4);
 	}
-    return histogram;
 }
 
 function createMainMenu() {
@@ -950,64 +813,71 @@ function updateTabs(num) {
 	$($('.menuitem')[num]).addClass('menuitemactive');
 }
 
-function sumFun(total, num) {
-  return total + num;
-}
 
-function sumFun2(total,num) {
-	
-	
-}
 
-function sanitize(string) {
-	const map = {
-		'&': '&amp;',
-		'<': '&lt;',
-		'>': '&gt;',
-		'"': '&quot;',
-		"'": '&#x27;',
-		"/": '&#x2F;',
-		//"`": '&grave;',
-	};
-	const reg = /[&<>"'/]/ig;
-	return string.replace(reg, (match)=>(map[match]));
-}
+function displayTutorial(n) {
 
-function downsample(data,num) {
-	
-	var i,j,k;
-	var res=[]; // result
-	var L=data.length;
-	var L2=data[0].length;
-	var tot=Math.ceil(L/num);
-	
-	if (L2>1) {
+	updateTabs(0);
+
+	$('#savePane').css("display","none");
+	var c = $("#tutorials div");
+	c.css("display","none");
+	$(".tutorialSelected").addClass("smallcontainerafter").removeClass("tutorialSelected");
+
+	if (c[n]) {
+		$(".smallcontainerafter").addClass("smallcontainer").removeClass("smallcontainerafter");
+		var Block=c[n];
+		Block.style.display="block";
 		
-		for (i=0;i<L;i++) {
-			if (i%num==0) {
-				j=i/num;
-				res[j]=[];
-				res[j][0]=data[i][0]; // keep the first date
-				for (let k=1;k<L2;k++) {
-					res[j][k]=0;
+		var Subje=document.getElementById(Block.title);
+		if (Subje) {
+			var SPos=Subje.getBoundingClientRect();
+			var w=window.innerWidth;
+			var h=window.innerHeight;
+			
+			// quadrants check
+			if (SPos.left+SPos.right>w) {
+				
+				if (SPos.top+SPos.bottom>h) {
+					Block.style.top=SPos.top+"px";
+					Block.style.left=SPos.left-530+"px";
+				} else {
+					Block.style.left=SPos.left+"px";
+					Block.style.top=SPos.bottom+"px";
 				}
+			} else {
+				Block.style.left=SPos.right+"px";
+				Block.style.top=SPos.top+"px";
 			}
-			for (let k=1;k<L2;k++) {
-				res[j][k]+=data[i][k]/num;
-			}
+			Subje.className="tutorialSelected";	
 		}
-	
-	} else {
 		
-		for (j=0;j<tot;j++) {
-			res[j]=data.splice(0,num).reduce(sumFun);
+		if ($(Block).find("span").length==0) {
+		var Prev=$('<span>back</span>').click(function(){displayTutorial(n-1);});
+		var Clos=$('<span>exit</span>').click(function(){displayTutorial(-1);});
+		var Next=$('<span>next</span>').click(function(){displayTutorial(n+1);});
+		//Block.addEventListener("click",function() {displayTutorial(n+1);});
+		Block.append(Prev[0],Clos[0],Next[0]);
 		}
+		
+	} else {
+		$(".smallcontainer").addClass("smallcontainerafter").removeClass("smallcontainer");
+		
+		/*
+		var bottone=$("#replaytutorial");
+		var offset = bottone.offset();
+		var leftoff=Math.round(offset.left+bottone.width()/2)+'px';
+		$("#tutorialReminder").css({'left':leftoff,'display':'block','opacity':1});
+		setTimeout(function(){ $("#tutorialReminder").css('opacity','0'); }, 1000);
+		setTimeout(function(){ $("#tutorialReminder").css('display','none'); }, 5000);
+		*/
+
+		//replaytutorial
+		//$(".tutorialSelected").addClass("smallcontainerafter").removeClass("tutorialSelected");
+		//$("#tutorials").css("display","none");
 	}
-	
-	return res;
-	
+
+	return null;
+
 }
-
-
-
 
