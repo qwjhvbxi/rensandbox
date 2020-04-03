@@ -411,6 +411,7 @@ function generateLoad() {
 
 function adaptRes(minDate, maxDate, yRanges) {
 	
+	// in case it's called from range selector
 	if (maxDate===undefined) {
 		minDate=g1.dateWindow_[0];
 		maxDate=g1.dateWindow_[1];
@@ -418,14 +419,16 @@ function adaptRes(minDate, maxDate, yRanges) {
 	
 	//console.log(maxDate-minDate)
 	var newData,newDataStacked,newDataStorage;
-	var st=g1.user_attrs_.stackedGraph;
+	var st=g1.user_attrs_.stackedGraph; // using stacked graph?
 	
+	// base data for splicing
 	if (st == true) {
 		baseData=PowerDataStacked96;
 	}else {
 		baseData=PowerData96;
 	}
 
+	// 3 resolutions levels
 	if (maxDate-minDate>200*24*3600*1000) {	
 		//console.log('96');
 		newData=baseData;
@@ -478,6 +481,7 @@ function adaptRes(minDate, maxDate, yRanges) {
 	
 }
 
+/*
 function adaptResAlt(minDate, maxDate, yRanges) {
 	
 	
@@ -512,9 +516,9 @@ function adaptResAlt(minDate, maxDate, yRanges) {
 		g1.updateOptions({'file': newData,});
 	}
 	g2.updateOptions({'file': newDataStorage,});
-	//*/
 	
 }
+//*/
 
 function drawCharts() {
 
@@ -583,9 +587,12 @@ function drawCharts() {
 	});
  
 	$("#mask").css("display","none");
+	
+	// set mousedown event to trigger chart update from Range selector
 	$(".dygraph-rangesel-fgcanvas").mousedown(function(){attivato=1});
 }
 
+// check mouseup events for updating graph from Range selector
 attivato=0;
 $(this).mouseup(checkPointer);
 function checkPointer(){

@@ -191,6 +191,10 @@ a#runsim:hover {
 abbr a {
 	text-decoration:none;
 }
+input[type=range] {
+	width:130px;
+	
+}
 
 
 
