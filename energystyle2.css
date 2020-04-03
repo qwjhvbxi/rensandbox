@@ -435,6 +435,7 @@ input.deletescenariooption:hover {
 #loadDurationPlotLabels input {
 	width:0px;
 	height:0px;
+	opacity:0;
 }
 #energysourcesContainer {
 	width:540px;
@@ -446,9 +447,11 @@ input.deletescenariooption:hover {
 }
 .graph-checkbox-span {
 	text-decoration:line-through;
+	opacity:0.5;
 }
 .graph-checkbox-label input:checked ~ .graph-checkbox-span {
 	text-decoration:none;
+	opacity:1;
 }
 
 
