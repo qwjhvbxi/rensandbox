@@ -438,7 +438,7 @@ function adaptRes(minDate, maxDate, yRanges) {
 			}else {
 				newData=PowerData12;
 			}
-			newDataStorage=StorageData96;
+			newDataStorage=StorageData12;
 		} else {
 			//console.log('1');
 			if (st == true) {
