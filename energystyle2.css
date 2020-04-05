@@ -92,6 +92,9 @@ h1 {
 #powerlabels {
 	text-align:right;
 }
+#storagelabels {
+	text-align:right;
+}
 #storage {
 	height:200px;
 	background:white;

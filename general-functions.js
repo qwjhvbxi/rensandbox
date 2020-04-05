@@ -3,9 +3,9 @@
 CurrentVersion=0.13;
 ShowRangeSelector=true;
 Simplified=0;
-SolarCapInit=38;
-WindCapInit=40;
-FileName='data/GermanyData_2015.csv';
+// Files: column 0: Date; column 1: Load (MW); column 2: Solar (capacity factor); column 3: Wind (capacity factor)
+
+FileName='data/Germany_2015.csv';
 colorCodes={
 	Solar:"#aaaa00",
 	Wind:"#00aa33",
@@ -24,6 +24,8 @@ function initializeEnergy() {
 
 	initializeCaps(-1);
 	$("#VersionNo").html(CurrentVersion);
+	
+	ListScenarios();
 
 	get(FileName).then(function(response) {
 		generateLoad(response,drawCharts);
@@ -40,7 +42,21 @@ function initializeEnergy() {
 	
 }
 
-
+function ListScenarios() {
+	var i;
+	var optionHtml="";
+	for (let i=0;i<Scenarios.length;i++) {
+		optionHtml+="<option value='"+i+"' ";
+		if (Scenarios[i].Active==false) {
+			optionHtml+="disabled";
+		}
+		optionHtml+=">"+Scenarios[i].Name+"</option>";
+	}
+	$("#countryselect").html(optionHtml);
+	$("#countryselect").change(function() {
+		console.log($("#countryselect").val());
+	});
+}
 							
 function updateRanges() {
 	
@@ -267,10 +283,10 @@ function generateLoad() {
 			
 	for (i=0,itot=ThisData.length;i<itot;i++) {
 		
-		Load[i]=ThisData[i][4]/1000;
+		Load[i]=ThisData[i][1]/1000;
 		
-		Solar[i]=ThisData[i][1]/SolarCapInit*CapChoice.Solar.PowerCapacity/1000;
-		Wind[i]=(ThisData[i][2]+ThisData[i][3])/WindCapInit*CapChoice.Wind.PowerCapacity/1000;
+		Solar[i]=ThisData[i][2]*CapChoice.Solar.PowerCapacity;
+		Wind[i]=ThisData[i][3]*CapChoice.Wind.PowerCapacity;
 		
 		phsPowerHigh=Math.min(phsStorage[i]*(CapChoice.PHS.Efficiency/100),CapChoice.PHS.PowerCapacity); // generation
 		phsPowerLow=Math.max(phsStorage[i]-CapChoice.PHS.StorageCapacity,-CapChoice.PHS.PowerCapacity) // storage
@@ -453,17 +469,15 @@ function adaptRes(minDate, maxDate, yRanges) {
 		}
 		
 		var VecL=newData.length;
+		
 		var VecStart=Math.floor((minDate-EpochStart)/(EpochL)*VecL);
 		var VecEnd=Math.ceil((maxDate-EpochStart)/(EpochL)*VecL);
 		var spliceStart=Math.floor((minDate-EpochStart)/(EpochL)*SpliceL);
 		var spliceEnd=Math.ceil((maxDate-EpochStart)/(EpochL)*SpliceL);
 
-		var newclone = newData.slice();
-		var mezzo = newclone.splice(VecStart,VecEnd-VecStart);
-		
-		var spliceVec = baseData.slice();
-		var prima = spliceVec.splice(0, spliceStart);
-		var dopo = spliceVec.splice(spliceEnd-spliceStart);
+		var mezzo = newData.slice(VecStart,VecEnd);
+		var prima = baseData.slice(0, spliceStart);
+		var dopo = baseData.slice(spliceEnd);
 		/*
 		console.log(VecStart)
 		console.log(VecEnd)
@@ -557,13 +571,14 @@ function drawCharts() {
 		title: '',
 		ylabel: 'Energy (GWh)',
 		legend: 'always',
-		showRangeSelector: ShowRangeSelector,
+		showRangeSelector: false,//ShowRangeSelector,
 		rangeSelectorHeight: 30,
 		labels: StorageLabels,
 		colors: StorageColors,
 		maxNumberWidth: 20,
 		stackedGraph: true,
 		height: 200,
+		labelsDiv:'storagelabels',
 		zoomCallback:adaptRes,
 		animatedZooms:false,
 		//rollPeriod: 14,
@@ -593,6 +608,7 @@ function drawCharts() {
 }
 
 // check mouseup events for updating graph from Range selector
+
 attivato=0;
 $(this).mouseup(checkPointer);
 function checkPointer(){
@@ -601,6 +617,7 @@ function checkPointer(){
 		attivato=0;
 	}
 }
+//*/
 
 
 function createLoadDuration(data,LabelIn,ColorsIn) {

@@ -1,4 +1,25 @@
 
+
+
+Scenarios=[
+	{
+		Name:'Germany (2015)',
+		FileName:'Germany_2015',
+		Active:true,
+	},
+	{
+		Name:'Italy (2019)',
+		FileName:'Italy_2019',
+		Active:false,
+	},
+	{
+		Name:'Japan (2019)',
+		FileName:'Japan_2019',
+		Active:false,
+	},
+]
+
+
 CapChoiceOptionsDefault=[
 	{
 		Name:'Germany 2015',
