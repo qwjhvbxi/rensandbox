@@ -1,6 +1,6 @@
 
 // general info
-CurrentVersion=0.15;
+CurrentVersion=0.16;
 ShowRangeSelector=true;
 Simplified=0;
 // Files: column 0: Date; column 1: Load (MW); column 2: Solar (capacity factor); column 3: Wind (capacity factor)
@@ -27,6 +27,8 @@ function initializeApp() {
 	
 	initializeScenario();
 	
+	updateSimplified();
+	
 }
 
 
@@ -35,6 +37,18 @@ function initializeScenario() {
 	CurrentScenario=UserOptions.Scenario;
 	FileName='data/'+Scenarios[CurrentScenario].FileName+'.csv';//'data/Germany_2015.csv';
 	
+	console.log(CurrentScenario)
+	for (var key in Scenarios[CurrentScenario]) {
+		if ($('#'+key) && Scenarios[CurrentScenario][key].length>1) {
+			$('#'+key).attr({
+			   "min" : Scenarios[CurrentScenario][key][0],
+			   "max" : Scenarios[CurrentScenario][key][1],
+			   "step": Scenarios[CurrentScenario][key][2],
+			});
+		}
+	}
+	
+
 	get(FileName).then(function(response) {
 		changeState(generateLoad);
 	}, function(error) {
@@ -46,6 +60,13 @@ function initializeScenario() {
 		localStorage.setItem('UserOptions', JSON.stringify(UserOptions));
 		changeState(drawCharts)
 	});
+	document.getElementById('advancedcontroloption').addEventListener('change',function() {
+		UserOptions.Advanced=document.getElementById("advancedcontroloption").checked;
+		localStorage.setItem('UserOptions', JSON.stringify(UserOptions));
+		updateSimplified();
+	});
+	
+	showScenarios();
 	
 }
 
@@ -202,6 +223,7 @@ function writeOptions() {
 		}
 	}
 	document.getElementById("stackedopt").checked=UserOptions.Stacked;
+	document.getElementById("advancedcontroloption").checked=UserOptions.Advanced;
 	$("#countryselect").val(UserOptions.Scenario.toString());
 	//$('#countryselect option[value='+UserOptions.Scenario.toString()+']').attr('selected','selected');
 }
@@ -218,6 +240,7 @@ function saveScenario() {
 	if (ScenarioName!='' && ScenarioComment!='') {
 		readOptions();
 		var CC=$.extend( {}, CapChoice);
+		CC.ScenarioName=Scenarios[UserOptions.Scenario].Name;
 		CC.Name=ScenarioName;
 		CC.Comment=ScenarioComment;
 		CapChoiceOptions.push(CC);
@@ -271,6 +294,12 @@ function generateLoad() {
 	ThisData=EnergyData.data;
 	localStorage.setItem('LastCapChoice', JSON.stringify(CapChoice));
 	
+	EpochStart=ThisData[0][0].getTime();
+	EpochEnd=ThisData[ThisData.length-1][0].getTime();
+	EpochL=EpochEnd-EpochStart;
+	
+	var Resolution=Math.round(EpochL/ThisData.length/1000/60); // time resolution in minutes
+	HR=60/Resolution;
 	var i,p2gPowerHigh,p2gPowerLow;	
 	
 	PowerData=[];
@@ -382,11 +411,11 @@ function generateLoad() {
 	Peak.Surplus=Math.max.apply(Math, Surplus);
 	
 	// costs
-	VariableCost=CapChoice.Nuclear.VariableCost*Total.Nuclear/4;
-	VariableCost+=CapChoice.Solar.VariableCost*Total.Solar/4;
-	VariableCost+=CapChoice.Wind.VariableCost*Total.Wind/4;
-	VariableCost+=CapChoice.PHS.VariableCost*Total.PHS/4;
-	VariableCost+=CapChoice.P2G.VariableCost*Total.P2G/4;	
+	VariableCost=CapChoice.Nuclear.VariableCost*Total.Nuclear/HR;
+	VariableCost+=CapChoice.Solar.VariableCost*Total.Solar/HR;
+	VariableCost+=CapChoice.Wind.VariableCost*Total.Wind/HR;
+	VariableCost+=CapChoice.PHS.VariableCost*Total.PHS/HR;
+	VariableCost+=CapChoice.P2G.VariableCost*Total.P2G/HR;	
 	
 	// amount of % for each additional GW
 	SolarDemandPerc=Total.Solar/CapChoice.Solar.PowerCapacity/Total.Load*100;
@@ -402,7 +431,7 @@ function generateLoad() {
 		$(c[k]).html("<div class='infoItem'>"+c[k].title+"</div><span class='dot' style='background-color:"+colorCodes[c[k].title]+";transform:scale("+Math.sqrt((Total[c[k].title]+0.01)/Total.Load)+")'></span><div class='infoNumbers'><p><span>"+Math.round(Total[c[k].title]/1000/4)+"</span> TWh</p><p><span>"+(Math.round(Total[c[k].title]/Total.Load*1000)/10).toFixed(1)+"</span>%</p><p><span>"+Math.round(Peak[c[k].title])+"</span> GW</p></div>");
 		*/
 		//*
-		$(c[k]).html("<div class='infoItem'>"+c[k].title+"</div><span class='dot' style='background-color:"+colorCodes[c[k].title]+";transform:scale("+Math.sqrt((Total[c[k].title])/Total.Load)+")'></span><div class='infoNumbers'><p><span>"+(Math.round(Total[c[k].title]/Total.Load*1000)/10).toFixed(1)+"%</span></p><p><span>"+Math.round(Total[c[k].title]/1000/4)+"</span></p><p><span>"+Math.round(Peak[c[k].title])+"</span></p></div>");
+		$(c[k]).html("<div class='infoItem'>"+c[k].title+"</div><span class='dot' style='background-color:"+colorCodes[c[k].title]+";transform:scale("+Math.sqrt((Total[c[k].title])/Total.Load)+")'></span><div class='infoNumbers'><p><span>"+(Math.round(Total[c[k].title]/Total.Load*1000)/10).toFixed(1)+"%</span></p><p><span>"+Math.round(Total[c[k].title]/1000/HR)+"</span></p><p><span>"+Math.round(Peak[c[k].title])+"</span></p></div>");
 		//*/
 		/*
 		$(c[k]).html(""+c[k].title+": "+Math.round(Total[c[k].title]/1000/4)+" TWh ("+(Math.round(Total[c[k].title]/Total.Load*1000)/10).toFixed(1)+"% of demand). Peak: "+Math.round(Peak[c[k].title])+" GW");
@@ -413,8 +442,8 @@ function generateLoad() {
 	//$("#costperyeardot").css("transform","scale("+Math.sqrt((CapitalCost+VariableCost)/1e5)+")");
 	
 	//<span class='dot' style='background-color:"+colorCodes[c[k].title]+";transform:scale("+Math.sqrt((Total[c[k].title])/Total.Load)+")'></span>
-	$("#costperkwh").html((Math.round((CapitalCost+VariableCost)/((Total.Load-Total.Unserved)/4)*100)/100).toFixed(2))
-	$("#costperkwhdot").css("transform","scale("+Math.sqrt(((CapitalCost+VariableCost)/((Total.Load-Total.Unserved)/4))/(0.2))+")");
+	$("#costperkwh").html((Math.round((CapitalCost+VariableCost)/((Total.Load-Total.Unserved)/HR)*100)/100).toFixed(2))
+	$("#costperkwhdot").css("transform","scale("+Math.sqrt(((CapitalCost+VariableCost)/((Total.Load-Total.Unserved)/HR))/(0.2))+")");
 	
 	if (Total.Unserved>0) {
 		$("#resultsContainer2").addClass("Alert");
@@ -424,20 +453,21 @@ function generateLoad() {
 	
 	$("#plots").css({"visibility":"visible"});
 	$("#resultsContainer2").css({"visibility":"visible"});
+
+	var LevelCoarse=Math.round(24*60/Resolution);
+	var LevelMedium=Math.round(3*60/Resolution);
 	
-	PowerData96=downsample(PowerData,96);
-	PowerData12=downsample(PowerData,12);
-	PowerDataStacked96=downsample(PowerDataStacked,96);
-	PowerDataStacked12=downsample(PowerDataStacked,12);
-	StorageData96=downsample(StorageData,96);
-	StorageData12=downsample(StorageData,12);
+	PowerData96=downsample(PowerData,LevelCoarse);
+	PowerData12=downsample(PowerData,LevelMedium);
+	PowerDataStacked96=downsample(PowerDataStacked,LevelCoarse);
+	PowerDataStacked12=downsample(PowerDataStacked,LevelMedium);
+	StorageData96=downsample(StorageData,LevelCoarse);
+	StorageData12=downsample(StorageData,LevelMedium);
+	
+	SpliceL=PowerData96.length;
 		
 	//EpochStart=new Date("2015/01/01 00:00:00").getTime();
 	//EpochEnd=new Date("2016/01/01 00:00:00").getTime();
-	EpochStart=ThisData[0][0].getTime();
-	EpochEnd=ThisData[ThisData.length-1][0].getTime();
-	EpochL=EpochEnd-EpochStart;
-	SpliceL=PowerData96.length;
 	
 	drawCharts();
 	displayPie();
@@ -779,10 +809,10 @@ function displayPie() {
 		ServedWithPHS[i]=Math.max(0,phsPower[i]);
 	}
 	var data1=[
-		Math.round(ServedDirectly.reduce(sumFun)/4/1000*10)/10,
-		Math.round(ServedWithPHS.reduce(sumFun)/4/1000*10)/10,
-		Math.round(ServedWithP2G.reduce(sumFun)/4/1000*10)/10,
-		Math.round(Unserved.reduce(sumFun)/4/1000*10)/10
+		Math.round(ServedDirectly.reduce(sumFun)/HR/1000*10)/10,
+		Math.round(ServedWithPHS.reduce(sumFun)/HR/1000*10)/10,
+		Math.round(ServedWithP2G.reduce(sumFun)/HR/1000*10)/10,
+		Math.round(Unserved.reduce(sumFun)/HR/1000*10)/10
 	];
 					
 	var totale=data1.reduce(sumFun);
@@ -824,9 +854,8 @@ function displayPie() {
 	});
 }
 
-function toggleSimplified() {
-	Simplified=1-Simplified;
-	if (Simplified==0) {
+function updateSimplified() {
+	if (UserOptions.Advanced==true) {
 		$(".economic").css({display:"table-cell"});
 		$("#genchar").attr('colspan',1);
 	} else {
