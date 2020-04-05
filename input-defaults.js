@@ -1,5 +1,9 @@
 
 
+UserOptions={
+	Stacked:true,
+	Scenario:0,
+}
 
 Scenarios=[
 	{
@@ -10,8 +14,7 @@ Scenarios=[
 	{
 		Name:'Italy (2019)',
 		FileName:'Italy_2019',
-		Active:false,
-	},
+		Active:true},
 	{
 		Name:'Japan (2019)',
 		FileName:'Japan_2019',
@@ -22,6 +25,7 @@ Scenarios=[
 
 CapChoiceOptionsDefault=[
 	{
+		ScenarioName:'Germany (2015)',
 		Name:'Germany 2015',
 		Nuclear: {
 			PowerCapacity:11,
@@ -77,11 +81,9 @@ CapChoiceOptionsDefault=[
 			VariableCost:0, // $ per kWh
 			LifeSpan:10,
 		},
-		Options: {
-			Stacked:true,
-		},
 	},
 	{
+		ScenarioName:'Germany (2015)',
 		Name:'Germany 2019',
 		Nuclear: {
 			PowerCapacity:9,
@@ -136,9 +138,6 @@ CapChoiceOptionsDefault=[
 			CapitalCostStorage:50, // $ per kWh
 			VariableCost:0, // $ per kWh
 			LifeSpan:10,
-		},
-		Options: {
-			Stacked:true,
 		},
 	},
 ]

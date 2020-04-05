@@ -1,11 +1,9 @@
 
 // general info
-CurrentVersion=0.13;
+CurrentVersion=0.15;
 ShowRangeSelector=true;
 Simplified=0;
 // Files: column 0: Date; column 1: Load (MW); column 2: Solar (capacity factor); column 3: Wind (capacity factor)
-
-FileName='data/Germany_2015.csv';
 colorCodes={
 	Solar:"#aaaa00",
 	Wind:"#00aa33",
@@ -20,23 +18,32 @@ colorCodes={
 }
 
 
-function initializeEnergy() {
+function initializeApp() {
 
 	initializeCaps(-1);
 	$("#VersionNo").html(CurrentVersion);
 	
 	ListScenarios();
+	
+	initializeScenario();
+	
+}
 
+
+function initializeScenario() {
+	
+	CurrentScenario=UserOptions.Scenario;
+	FileName='data/'+Scenarios[CurrentScenario].FileName+'.csv';//'data/Germany_2015.csv';
+	
 	get(FileName).then(function(response) {
-		generateLoad(response,drawCharts);
+		changeState(generateLoad);
 	}, function(error) {
 		console.error("Failed!", error);
 	})
 
 	document.getElementById('stackedopt').addEventListener('change',function() {
-		CapChoice.Options.Stacked=document.getElementById("stackedopt").checked;
-		localStorage.setItem('LastCapChoice', JSON.stringify(CapChoice));
-		//drawCharts();
+		UserOptions.Stacked=document.getElementById("stackedopt").checked;
+		localStorage.setItem('UserOptions', JSON.stringify(UserOptions));
 		changeState(drawCharts)
 	});
 	
@@ -49,12 +56,18 @@ function ListScenarios() {
 		optionHtml+="<option value='"+i+"' ";
 		if (Scenarios[i].Active==false) {
 			optionHtml+="disabled";
+		} else {
+			if (UserOptions.Scenario==i) {
+				optionHtml+=" selected";
+			}
 		}
 		optionHtml+=">"+Scenarios[i].Name+"</option>";
 	}
 	$("#countryselect").html(optionHtml);
 	$("#countryselect").change(function() {
-		console.log($("#countryselect").val());
+		UserOptions.Scenario=$("#countryselect").val();
+		localStorage.setItem('UserOptions', JSON.stringify(UserOptions));
+		initializeScenario() 
 	});
 }
 							
@@ -90,6 +103,12 @@ function initializeCaps(resetOption) {
 			localStorage.setItem('SavedVersion', CurrentVersion);
 		}
 		
+		if (localStorage.getItem("UserOptions")) {
+			UserOptions=JSON.parse(localStorage.getItem('UserOptions'));
+		} else {
+			localStorage.setItem('UserOptions', JSON.stringify(UserOptions));
+		}
+		
 		if (localStorage.getItem("LastCapChoice")) {
 			CapChoice = JSON.parse(localStorage.getItem('LastCapChoice'));
 			if (localStorage.getItem("LastCapChoiceOptions")) {
@@ -100,12 +119,15 @@ function initializeCaps(resetOption) {
 			return;
 		} else {
 			CapChoiceOptions = JSON.parse(JSON.stringify(CapChoiceOptionsDefault));
+			/*
 			if ($("#tutorialReminder").css('display')!='none') {
 				displayTutorial(0);
 			} else {
 				console.log('tutorial hidden')
 			}
+			*/
 		}
+		
 		
 	}
 	
@@ -135,7 +157,7 @@ function initializeCaps(resetOption) {
 	var stackedOption
 	if (resetOption>=0) {
 		stackedOption=document.getElementById("stackedopt").checked;
-		CapChoice.Options.Stacked=stackedOption;
+		UserOptions.Stacked=stackedOption;
 	} 
 
 	writeOptions()
@@ -159,7 +181,7 @@ function initializeCaps(resetOption) {
 function readOptions() {
 	var NewValue;
 	for (var key in CapChoice) {
-		if (typeof CapChoice[key] === 'object' && CapChoice[key] !== null && key !== 'Options') {
+		if (typeof CapChoice[key] === 'object' && CapChoice[key] !== null) {
 			for (var key2 in CapChoice[key]) {
 				NewValue=$('#'+key+key2).val();
 				if (typeof NewValue !== 'undefined') {
@@ -173,14 +195,15 @@ function readOptions() {
 function writeOptions() {
 	
 	for (var key in CapChoice) {
-		if (typeof CapChoice[key] === 'object' && CapChoice[key] !== null && key !== 'Options') {
+		if (typeof CapChoice[key] === 'object' && CapChoice[key] !== null) {
 			for (var key2 in CapChoice[key]) {
 				$('#'+key+key2).val(CapChoice[key][key2]);
 			}
 		}
 	}
-	document.getElementById("stackedopt").checked=CapChoice.Options.Stacked;
-	
+	document.getElementById("stackedopt").checked=UserOptions.Stacked;
+	$("#countryselect").val(UserOptions.Scenario.toString());
+	//$('#countryselect option[value='+UserOptions.Scenario.toString()+']').attr('selected','selected');
 }
 
 function displaySave() {
@@ -210,8 +233,9 @@ function saveScenario() {
 function showScenarios() {
 	$('#inputPresets').html('')
 	for (let i=0;i<CapChoiceOptions.length;i++) {
-		
-		$('#inputPresets').append($("<input type='submit' class='scenariooptions' value='"+CapChoiceOptions[i].Name+"' onclick='initializeCaps("+i+")'><input type='submit' class='deletescenariooption' value='x' onclick='deleteScenario("+i+")'>"));
+		if (CapChoiceOptions[i].ScenarioName==Scenarios[UserOptions.Scenario].Name) {
+			$('#inputPresets').append($("<input type='submit' class='scenariooptions' value='"+CapChoiceOptions[i].Name+"' onclick='initializeCaps("+i+")'><input type='submit' class='deletescenariooption' value='x' onclick='deleteScenario("+i+")'>"));
+		}
 	}
 }
 
@@ -246,10 +270,6 @@ function generateLoad() {
 	readOptions()
 	ThisData=EnergyData.data;
 	localStorage.setItem('LastCapChoice', JSON.stringify(CapChoice));
-	
-	//document.getElementById("PVLandRequirement").innerHTML=(14*CapChoice.solarCap); 
-	//1.4 ha/MW  - 14 km2/GW
-	//(https://www.ise.fraunhofer.de/content/dam/ise/en/documents/publications/studies/recent-facts-about-photovoltaics-in-germany.pdf)
 	
 	var i,p2gPowerHigh,p2gPowerLow;	
 	
@@ -412,13 +432,16 @@ function generateLoad() {
 	StorageData96=downsample(StorageData,96);
 	StorageData12=downsample(StorageData,12);
 		
-	EpochStart=new Date("2015/01/01 00:00:00").getTime();
-	EpochEnd=new Date("2016/01/01 00:00:00").getTime();
+	//EpochStart=new Date("2015/01/01 00:00:00").getTime();
+	//EpochEnd=new Date("2016/01/01 00:00:00").getTime();
+	EpochStart=ThisData[0][0].getTime();
+	EpochEnd=ThisData[ThisData.length-1][0].getTime();
 	EpochL=EpochEnd-EpochStart;
 	SpliceL=PowerData96.length;
 	
 	drawCharts();
 	displayPie();
+	adaptRes(EpochStart,EpochEnd);
 	
 	setTimeout(createLoadDuration([Solar,Wind,Nuclear,phsPower,p2gPower],['percentile','solar','wind','nuclear','PHS','P2G'],[colorCodes.Solar,colorCodes.Wind,colorCodes.Nuclear,colorCodes.PHS,colorCodes.P2G]), 50);
 	
@@ -545,7 +568,7 @@ function drawCharts() {
 		interactionModel: Dygraph.defaultInteractionModel,
 		rangeSelectorHeight: 30,
 		maxNumberWidth: 20,
-		stackedGraph: CapChoice.Options.Stacked,
+		stackedGraph: UserOptions.Stacked,
 		height:250,//320,
 		labelsDiv:'powerlabels',
 		zoomCallback:adaptRes,
@@ -553,7 +576,7 @@ function drawCharts() {
 		animatedZooms:true,
 	};
 
-	if (CapChoice.Options.Stacked==false) {
+	if (UserOptions.Stacked==false) {
 		options1.labels=PowerLabels;
 		options1.colors=PowerColors;
 		g1=new Dygraph(target1,PowerData96,options1);
