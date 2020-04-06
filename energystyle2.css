@@ -51,6 +51,9 @@ h1 {
 	display: inline-block;
 	z-index:90;
 }
+input {
+	font-family:helvetica,sans,arial;
+}
 
 
 
@@ -196,6 +199,7 @@ a#runsim:hover {
 }
 abbr a {
 	text-decoration:none;
+	color:#666;
 }
 input[type=range] {
 	width:130px;
