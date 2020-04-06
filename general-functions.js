@@ -554,6 +554,15 @@ function drawCharts() {
 	
 	// set mousedown event to trigger chart update from Range selector
 	$(".dygraph-rangesel-fgcanvas").mousedown(function(){attivato=1});
+	
+	// set mousedown event + alt/shift key press to trigger chart update from pan
+	$('#powerchart').mousedown(function(e){
+		if (e.shiftKey || e.altKey) { attivato=1 }
+	});
+	$('#storage').mousedown(function(){
+		if (e.shiftKey || e.altKey) { attivato=1 }
+	});
+	
 }
 
 // check mouseup events for updating graph from Range selector
