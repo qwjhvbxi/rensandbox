@@ -227,9 +227,10 @@
 					<input class='bottone' type="submit" value="save current scenario" onclick="displaySave()"/><input class='bottone' type="submit" value="reset to defaults" onclick="initializeCaps(2)"/>
 					
 					<div id="savePane">
-						<input type="text" id="saveScenarioName" placeholder="scenario name"></input>
+						<input class="bottoncino" type="text" id="saveScenarioName" placeholder="scenario name"></input>
 						<textarea id="saveScenarioComment" placeholder="Comments"></textarea>
-						<input type="submit" onclick="saveScenario()" value="save"></input><input type="submit" onclick="$('#savePane').css('display','none');" value="close"></input>
+						<input class="bottoncino" type="submit" onclick="saveScenario()" value="save"></input>
+						<input class="bottoncino" type="submit" onclick="$('#savePane').css('display','none');" value="close"></input>
 					</div>
 				</div>
 			</div>

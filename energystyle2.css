@@ -135,7 +135,10 @@ h1 {
 	font-size:10pt;
 	-webkit-transform: translate3d( 0, 0, 0);
 }
-
+.dygraph-xlabel {
+	margin-left:50%;
+	
+}
 
 
 
@@ -346,7 +349,7 @@ input.bottone:hover {
 #inputPresets::before {
 	content:"Saved scenarios: ";
 	margin-right:20px;
-	display:block;
+	display:inline-block;
 	padding-bottom:5px;
 }
 input.scenariooptions, input.scenariooptionsdefault {
@@ -395,20 +398,28 @@ input.deletescenariooption:hover {
 	position:relative;
 	padding:10px 0px 10px 0px;
 }
-#savePane input {
-	
-	color:#666;
-	padding:5px;
+input.bottoncino {
+	background:white;
+	border:1px solid #aaa;
+	-webkit-transition: .2s;
+	transition: .2s;
+	/*
 	border:1px solid #ddd;
+	*/
+	padding:5px;
+	color:#666;
 	min-width:100px;
 	margin:5px 5px 5px 0px;
 	display:inline-block;
 	border-radius:3px;
 }
+input[type=submit].bottoncino:hover {
+	background:#7FFFD4;
+}
 #savePane textarea {
 	color:#666;
 	padding:5px;
-	border:1px solid #ddd;
+	border:1px solid #aaa;
 	width:100%;
 	display:block;
 	outline:none;
