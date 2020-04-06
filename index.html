@@ -280,6 +280,7 @@
 				<h2>Model details</h2>
 				
 				<p>This app simulates the electricity system of the country in a very simplified way. In reality, there are many more issues to consider, such as transmission lines constraints, international exchanges, power ramping constraints, and the need for reserves in case of emergency (such as the failure of a power plant). </p>
+				<p>The purpose of this app is only to better understand the dynamics of renewable energy generation and storage at a country level.</p>
 				<p>The generation from solar and wind is based on the actual generation in the country in that year. The generation is scaled by the installed capacity given in input. The generation from nuclear power at each time interval is calculated as:</p>
 				
 				$${P_{nuclear} = \max { ( 0, \min{ (Load -P_{solar}-P_{wind}+ P_{max,P2G}+P_{max,PHS}} , P_{installed,nuclear})} ) }$$
@@ -289,8 +290,9 @@
 				$$P_{max,PHS}=\min{ (P_{installed,PHS}, S_{installed,PHS}-S_{PHS} ) }$$
 				
 				<p>This ensures that the storage is always charged as much as possible.</p>
+				<p>Storage is assumed to be half-full at the start of the year.</p>
 				<p>Costs are intended as running cost, or the amount you would have to pay each year to keep the system running by replacing a fraction of the generating capacity equal to the inverse of the lifespan.</p>
-				<p>The purpose of this app is only to better understand the dynamics of renewable energy generation and storage at a country level.</p>
+				
 			</div>
 		</div>
 	</div>
