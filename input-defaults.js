@@ -30,6 +30,7 @@ Scenarios=[
 	},
 ]
 
+CapChoiceOptionsUser = [];
 
 CapChoiceOptionsDefault=[
 	{

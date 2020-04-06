@@ -1,6 +1,6 @@
 
 // general info
-CurrentVersion=0.16;
+CurrentVersion=0.184;
 ShowRangeSelector=true;
 Simplified=0;
 // Files: column 0: Date; column 1: Load (MW); column 2: Solar (capacity factor); column 3: Wind (capacity factor)
@@ -20,17 +20,17 @@ colorCodes={
 
 function initializeApp() {
 
-	initializeCaps(-1);
+	initializeCaps(1);
+	
 	$("#VersionNo").html(CurrentVersion);
 	
-	ListScenarios();
+	listCountries();
 	
 	initializeScenario();
 	
 	updateSimplified();
 	
 }
-
 
 function initializeScenario() {
 	
@@ -70,7 +70,88 @@ function initializeScenario() {
 	
 }
 
-function ListScenarios() {
+function initializeCaps(resetOption) {
+	
+	// resetOption:
+	// 1 gets localstorage if it exists
+	// 2 delete user scenarios with prompt
+	// 3 delete user scenarios directly
+	
+	
+	if (resetOption==1) {
+		
+		// check if version exists
+		var SavedVersion=localStorage.getItem("SavedVersion");
+		if (SavedVersion==null || localStorage.getItem("SavedVersion")<CurrentVersion) {
+			localStorage.clear();
+			localStorage.setItem('SavedVersion', CurrentVersion);
+			console.log('new version')
+		} 
+		
+		var SavedUserOptions=localStorage.getItem("UserOptions");
+		if (SavedUserOptions!==null) {
+			UserOptions=JSON.parse(localStorage.getItem('UserOptions'));
+		} else {
+			localStorage.setItem('UserOptions', JSON.stringify(UserOptions));
+		}
+		
+		var LastCapChoiceOptions=localStorage.getItem("LastCapChoiceOptions");
+		if (LastCapChoiceOptions!==null) {
+			CapChoiceOptionsUser = JSON.parse(localStorage.getItem('LastCapChoiceOptions'));
+		} else {
+			localStorage.setItem('LastCapChoiceOptions', JSON.stringify(CapChoiceOptionsUser));
+		}
+		
+		var LastCapChoice=localStorage.getItem("LastCapChoice");
+		if (LastCapChoice!==null) {
+			CapChoice = JSON.parse(localStorage.getItem('LastCapChoice'));
+			writeOptions()
+		} else {
+			changeScenario(0,true)
+		}
+	}
+	
+	if (resetOption==2) {
+		var r = confirm("Delete all saved scenarios?");
+		if (r == true) {
+			resetOption=3;
+		} else {
+			return
+		}
+	}
+	
+	if (resetOption==3) {
+		CapChoiceOptionsUser = {};//JSON.parse(JSON.stringify(CapChoiceOptionsDefault))
+		localStorage.clear();
+		localStorage.setItem('UserOptions', JSON.stringify(UserOptions));
+		readOptions();
+		localStorage.setItem('LastCapChoice', JSON.stringify(CapChoice));
+		//localStorage.setItem('LastCapChoiceOptions', JSON.stringify(CapChoiceOptions));
+		writeOptions()
+		showScenarios()
+		return
+	}
+	
+}
+
+function changeScenario(S,DefaultS) {
+	
+	if (DefaultS==true) {
+		CapChoice=$.extend( {}, CapChoiceOptionsDefault[S] );
+	}else {
+		CapChoice=$.extend( {}, CapChoiceOptionsUser[S] );
+	}
+	
+	localStorage.setItem('LastCapChoice', JSON.stringify(CapChoice));
+	
+	writeOptions()
+	showScenarios()
+	updateRanges()
+	
+	console.log(CapChoice);
+}
+
+function listCountries() {
 	var i;
 	var optionHtml="";
 	for (let i=0;i<Scenarios.length;i++) {
@@ -91,7 +172,7 @@ function ListScenarios() {
 		initializeScenario() 
 	});
 }
-							
+
 function updateRanges() {
 	
 	var i,t;
@@ -99,105 +180,12 @@ function updateRanges() {
 	for (t=c.length,i=0;i<t;i++) {
 		$("#"+c[i].title).html(c[i].value);
 	}
-	$('#S2').html( Math.round($("#SolarPowerCapacity").val()*SolarDemandPerc*10)/10 )
-	$('#W2').html( Math.round($("#WindPowerCapacity").val()*WindDemandPerc*10)/10 )
-	$('#N2').html( Math.round($("#NuclearPowerCapacity").val()*NuclearDemandPerc*10)/10 )
-	
+	if (typeof SolarDemandPerc !== 'undefined') {
+		$('#S2').html( Math.round($("#SolarPowerCapacity").val()*SolarDemandPerc*10)/10 )
+		$('#W2').html( Math.round($("#WindPowerCapacity").val()*WindDemandPerc*10)/10 )
+		$('#N2').html( Math.round($("#NuclearPowerCapacity").val()*NuclearDemandPerc*10)/10 )
+	}
 }
-
-function initializeCaps(resetOption) {
-	
-	// resetOption:
-	// -1 gets localstorage if it exists
-	// -2 return defaults
-	
-	if (resetOption==-1) {
-		
-		//first run
-		if (localStorage.getItem("SavedVersion")) {
-			if (localStorage.getItem("SavedVersion")<CurrentVersion) {
-				localStorage.clear();
-				localStorage.setItem('SavedVersion', CurrentVersion);
-			}
-		} else {
-			localStorage.clear();
-			localStorage.setItem('SavedVersion', CurrentVersion);
-		}
-		
-		if (localStorage.getItem("UserOptions")) {
-			UserOptions=JSON.parse(localStorage.getItem('UserOptions'));
-		} else {
-			localStorage.setItem('UserOptions', JSON.stringify(UserOptions));
-		}
-		
-		if (localStorage.getItem("LastCapChoice")) {
-			CapChoice = JSON.parse(localStorage.getItem('LastCapChoice'));
-			if (localStorage.getItem("LastCapChoiceOptions")) {
-				CapChoiceOptions = JSON.parse(localStorage.getItem('LastCapChoiceOptions'));
-			}
-			writeOptions()
-			showScenarios()
-			return;
-		} else {
-			CapChoiceOptions = JSON.parse(JSON.stringify(CapChoiceOptionsDefault));
-			/*
-			if ($("#tutorialReminder").css('display')!='none') {
-				displayTutorial(0);
-			} else {
-				console.log('tutorial hidden')
-			}
-			*/
-		}
-		
-		
-	}
-	
-	if (resetOption==-2) {
-		var r = confirm("Delete all saved scenarios?");
-		if (r == true) {
-			resetOption=-3;
-		} else {
-			return			
-		}
-	}
-		
-	if (resetOption==-3) {
-		CapChoiceOptions = JSON.parse(JSON.stringify(CapChoiceOptionsDefault))
-		localStorage.clear();
-		readOptions();
-		localStorage.setItem('LastCapChoice', JSON.stringify(CapChoice));
-		localStorage.setItem('LastCapChoiceOptions', JSON.stringify(CapChoiceOptions));
-		writeOptions()
-		showScenarios()
-		return
-	}
-	
-	
-	CapChoice=$.extend( {}, CapChoiceOptions[Math.max(0,resetOption)] );
-	
-	var stackedOption
-	if (resetOption>=0) {
-		stackedOption=document.getElementById("stackedopt").checked;
-		UserOptions.Stacked=stackedOption;
-	} 
-
-	writeOptions()
-	showScenarios()
-
-	if (resetOption>=0) {
-		updateRanges();
-		/*
-		changeSolar();
-		changeWind();
-		changeNuclear();
-		*/
-	} else {
-		localStorage.setItem('LastCapChoice', JSON.stringify(CapChoice));
-		localStorage.setItem('LastCapChoiceOptions', JSON.stringify(CapChoiceOptions));
-	}
-	
-}
-
 
 function readOptions() {
 	var NewValue;
@@ -228,9 +216,36 @@ function writeOptions() {
 	//$('#countryselect option[value='+UserOptions.Scenario.toString()+']').attr('selected','selected');
 }
 
+function updateSimplified() {
+	if (UserOptions.Advanced==true) {
+		$(".economic").css({display:"table-cell"});
+		$("#genchar").attr('colspan',1);
+	} else {
+		$(".economic").css({display:"none"});
+		$("#genchar").attr('colspan',4);
+	}
+}
+
+function showScenarios() {
+	var text="";
+	
+	for (let i=0;i<CapChoiceOptionsDefault.length;i++) {
+		if (CapChoiceOptionsDefault[i].ScenarioName==Scenarios[UserOptions.Scenario].Name) {
+			text += "<input type='submit' class='scenariooptionsdefault' value='"+CapChoiceOptionsDefault[i].Name+"' onclick='changeScenario("+i+",true)'>";
+		}
+	}
+	
+	for (let i=0;i<CapChoiceOptionsUser.length;i++) {
+		if (CapChoiceOptionsUser[i].ScenarioName==Scenarios[UserOptions.Scenario].Name) {
+			text += "<input type='submit' class='scenariooptions' value='"+CapChoiceOptionsUser[i].Name+"' onclick='changeScenario("+i+",false)'><input type='submit' class='deletescenariooption' value='x' onclick='deleteScenario("+i+")'>";
+		}
+	}
+	$('#inputPresets').html($(text));
+}
+
 function displaySave() {
 	$('#savePane').css('display','block');
-}	
+}
 
 function saveScenario() {
 	
@@ -243,41 +258,37 @@ function saveScenario() {
 		CC.ScenarioName=Scenarios[UserOptions.Scenario].Name;
 		CC.Name=ScenarioName;
 		CC.Comment=ScenarioComment;
-		CapChoiceOptions.push(CC);
+		CapChoiceOptionsUser.push(CC);
 		$('#savePane').css('display','none');
-		localStorage.setItem('LastCapChoiceOptions', JSON.stringify(CapChoiceOptions));
-		showScenarios()
+		localStorage.setItem('LastCapChoiceOptions', JSON.stringify(CapChoiceOptionsUser));
+		sendSaved(CC);
+		showScenarios();
 	} else {
 		alert('Please write a title and a comment for the scenario');
 	}
 	
 }
 
-function showScenarios() {
-	$('#inputPresets').html('')
-	for (let i=0;i<CapChoiceOptions.length;i++) {
-		if (CapChoiceOptions[i].ScenarioName==Scenarios[UserOptions.Scenario].Name) {
-			$('#inputPresets').append($("<input type='submit' class='scenariooptions' value='"+CapChoiceOptions[i].Name+"' onclick='initializeCaps("+i+")'><input type='submit' class='deletescenariooption' value='x' onclick='deleteScenario("+i+")'>"));
-		}
+function sendSaved(CC) {
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+	if (this.readyState == 4 && this.status == 200) {
+		console.log(this.responseText);
 	}
+	};
+	xhttp.open("POST", "test.php", true);
+	xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhttp.send("savedScenario="+JSON.stringify(CC));
 }
 
 function deleteScenario(s) {
-	var r = confirm("Delete scenario '"+CapChoiceOptions[s].Name+"'?");
+	var r = confirm("Delete scenario '"+CapChoiceOptionsUser[s].Name+"'?");
 	if (r == true) {
-		CapChoiceOptions.splice(s,1);
-		localStorage.setItem('LastCapChoiceOptions', JSON.stringify(CapChoiceOptions));
+		CapChoiceOptionsUser.splice(s,1);
+		localStorage.setItem('LastCapChoiceOptions', JSON.stringify(CapChoiceOptionsUser));
 		showScenarios()
 	}
 }
-
-function adjustheight() {
-   w = window.innerWidth;
-   h = window.innerHeight;
-   $('#rightcontentwrapper').css('height',h-40-20-40);
-  
-}
-//window.addEventListener("resize", adjustheight);
 
 function changeState(callback) {
 	showMask2();
@@ -427,15 +438,10 @@ function generateLoad() {
 	var c=$(".results");
 	var k,t;
 	for (t=c.length,k=0;k<t;k++) {
-		/*
-		$(c[k]).html("<div class='infoItem'>"+c[k].title+"</div><span class='dot' style='background-color:"+colorCodes[c[k].title]+";transform:scale("+Math.sqrt((Total[c[k].title]+0.01)/Total.Load)+")'></span><div class='infoNumbers'><p><span>"+Math.round(Total[c[k].title]/1000/4)+"</span> TWh</p><p><span>"+(Math.round(Total[c[k].title]/Total.Load*1000)/10).toFixed(1)+"</span>%</p><p><span>"+Math.round(Peak[c[k].title])+"</span> GW</p></div>");
-		*/
-		//*
-		$(c[k]).html("<div class='infoItem'>"+c[k].title+"</div><span class='dot' style='background-color:"+colorCodes[c[k].title]+";transform:scale("+Math.sqrt((Total[c[k].title])/Total.Load)+")'></span><div class='infoNumbers'><p><span>"+(Math.round(Total[c[k].title]/Total.Load*1000)/10).toFixed(1)+"%</span></p><p><span>"+Math.round(Total[c[k].title]/1000/HR)+"</span></p><p><span>"+Math.round(Peak[c[k].title])+"</span></p></div>");
-		//*/
-		/*
-		$(c[k]).html(""+c[k].title+": "+Math.round(Total[c[k].title]/1000/4)+" TWh ("+(Math.round(Total[c[k].title]/Total.Load*1000)/10).toFixed(1)+"% of demand). Peak: "+Math.round(Peak[c[k].title])+" GW");
-		*/
+		$(c[k]).html("<div class='infoItem'>"+c[k].title+"</div>\
+		<span class='dot' style='background-color:"+colorCodes[c[k].title]+";transform:scale("+Math.sqrt((Total[c[k].title])/Total.Load)+")'></span>\
+		<div class='infoNumbers'><p><span>"+(Math.round(Total[c[k].title]/Total.Load*1000)/10).toFixed(1)+"%</span></p><p><span>"+Math.round(Total[c[k].title]/1000/HR)+"</span>\
+		</p><p><span>"+Math.round(Peak[c[k].title])+"</span></p></div>");
 	}
 	
 	$("#costperyear").html(Math.round((CapitalCost+VariableCost)/100)/10)
@@ -476,116 +482,6 @@ function generateLoad() {
 	setTimeout(createLoadDuration([Solar,Wind,Nuclear,phsPower,p2gPower],['percentile','solar','wind','nuclear','PHS','P2G'],[colorCodes.Solar,colorCodes.Wind,colorCodes.Nuclear,colorCodes.PHS,colorCodes.P2G]), 50);
 	
 }
-
-
-function adaptRes(minDate, maxDate, yRanges) {
-	
-	// in case it's called from range selector
-	if (maxDate===undefined) {
-		minDate=g1.dateWindow_[0];
-		maxDate=g1.dateWindow_[1];
-	}
-	
-	//console.log(maxDate-minDate)
-	var newData,newDataStacked,newDataStorage;
-	var st=g1.user_attrs_.stackedGraph; // using stacked graph?
-	
-	// base data for splicing
-	if (st == true) {
-		baseData=PowerDataStacked96;
-	}else {
-		baseData=PowerData96;
-	}
-
-	// 3 resolutions levels
-	if (maxDate-minDate>200*24*3600*1000) {	
-		//console.log('96');
-		newData=baseData;
-		newDataStorage=StorageData96;
-	} else {
-		if (maxDate-minDate>14*24*3600*1000) { 
-			//console.log('12');
-			if (st == true) {
-				newData=PowerDataStacked12;
-			}else {
-				newData=PowerData12;
-			}
-			newDataStorage=StorageData12;
-		} else {
-			//console.log('1');
-			if (st == true) {
-				newData=PowerDataStacked;
-			}else {
-				newData=PowerData;
-			}
-			newDataStorage=StorageData;
-		}
-		
-		var VecL=newData.length;
-		
-		var VecStart=Math.floor((minDate-EpochStart)/(EpochL)*VecL);
-		var VecEnd=Math.ceil((maxDate-EpochStart)/(EpochL)*VecL);
-		var spliceStart=Math.floor((minDate-EpochStart)/(EpochL)*SpliceL);
-		var spliceEnd=Math.ceil((maxDate-EpochStart)/(EpochL)*SpliceL);
-
-		var mezzo = newData.slice(VecStart,VecEnd);
-		var prima = baseData.slice(0, spliceStart);
-		var dopo = baseData.slice(spliceEnd);
-		/*
-		console.log(VecStart)
-		console.log(VecEnd)
-		console.log(spliceStart)
-		console.log(spliceEnd)
-		console.log(prima)
-		console.log(mezzo)
-		console.log(dopo)
-		*/
-		newData=prima.concat(mezzo,dopo);	
-	}
-	
-	g1.updateOptions({'file': newData,});
-	g2.updateOptions({'file': newDataStorage,});
-	
-}
-
-/*
-function adaptResAlt(minDate, maxDate, yRanges) {
-	
-	
-	var newData,newDataStacked,newDataStorage;
-	
-	if (maxDate-minDate>200*24*3600*1000) {	
-		
-		//console.log('96');
-		newData=PowerData96;
-		newDataStacked=PowerDataStacked96;
-		newDataStorage=StorageData96;
-				
-	} else {
-		
-		if (maxDate-minDate>14*24*3600*1000) { 
-			//console.log('12');
-			newData=PowerData12;
-			newDataStacked=PowerDataStacked12;
-			newDataStorage=StorageData12;
-		} else {
-			//console.log('1');
-			newData=PowerData;
-			newDataStacked=PowerDataStacked;
-			newDataStorage=StorageData;
-		}
-		
-	}
-	
-	if (g1.user_attrs_.stackedGraph == true) {
-		g1.updateOptions({'file': newDataStacked,});
-	} else {
-		g1.updateOptions({'file': newData,});
-	}
-	g2.updateOptions({'file': newDataStorage,});
-	
-}
-//*/
 
 function drawCharts() {
 
@@ -661,7 +557,6 @@ function drawCharts() {
 }
 
 // check mouseup events for updating graph from Range selector
-
 attivato=0;
 $(this).mouseup(checkPointer);
 function checkPointer(){
@@ -670,8 +565,76 @@ function checkPointer(){
 		attivato=0;
 	}
 }
-//*/
 
+function adaptRes(minDate, maxDate, yRanges) {
+	
+	// in case it's called from range selector
+	if (maxDate===undefined) {
+		minDate=g1.dateWindow_[0];
+		maxDate=g1.dateWindow_[1];
+	}
+	
+	//console.log(maxDate-minDate)
+	var newData,newDataStacked,newDataStorage;
+	var st=g1.user_attrs_.stackedGraph; // using stacked graph?
+	
+	// base data for splicing
+	if (st == true) {
+		baseData=PowerDataStacked96;
+	}else {
+		baseData=PowerData96;
+	}
+
+	// 3 resolutions levels
+	if (maxDate-minDate>200*24*3600*1000) {	
+		//console.log('96');
+		newData=baseData;
+		newDataStorage=StorageData96;
+	} else {
+		if (maxDate-minDate>14*24*3600*1000) { 
+			//console.log('12');
+			if (st == true) {
+				newData=PowerDataStacked12;
+			}else {
+				newData=PowerData12;
+			}
+			newDataStorage=StorageData12;
+		} else {
+			//console.log('1');
+			if (st == true) {
+				newData=PowerDataStacked;
+			}else {
+				newData=PowerData;
+			}
+			newDataStorage=StorageData;
+		}
+		
+		var VecL=newData.length;
+		
+		var VecStart=Math.floor((minDate-EpochStart)/(EpochL)*VecL);
+		var VecEnd=Math.ceil((maxDate-EpochStart)/(EpochL)*VecL);
+		var spliceStart=Math.floor((minDate-EpochStart)/(EpochL)*SpliceL);
+		var spliceEnd=Math.ceil((maxDate-EpochStart)/(EpochL)*SpliceL);
+
+		var mezzo = newData.slice(VecStart,VecEnd);
+		var prima = baseData.slice(0, spliceStart);
+		var dopo = baseData.slice(spliceEnd);
+		/*
+		console.log(VecStart)
+		console.log(VecEnd)
+		console.log(spliceStart)
+		console.log(spliceEnd)
+		console.log(prima)
+		console.log(mezzo)
+		console.log(dopo)
+		*/
+		newData=prima.concat(mezzo,dopo);	
+	}
+	
+	g1.updateOptions({'file': newData,});
+	g2.updateOptions({'file': newDataStorage,});
+	
+}
 
 function createLoadDuration(data,LabelIn,ColorsIn) {
 	
@@ -854,16 +817,7 @@ function displayPie() {
 	});
 }
 
-function updateSimplified() {
-	if (UserOptions.Advanced==true) {
-		$(".economic").css({display:"table-cell"});
-		$("#genchar").attr('colspan',1);
-	} else {
-		$(".economic").css({display:"none"});
-		$("#genchar").attr('colspan',4);
-	}
-}
-
+/*
 function createMainMenu() {
 	var c=$('.contentpanel');
 	var m=$('#mainmenu');
@@ -888,8 +842,6 @@ function updateTabs(num) {
 	$('.menuitem').removeClass('menuitemactive');
 	$($('.menuitem')[num]).addClass('menuitemactive');
 }
-
-
 
 function displayTutorial(n) {
 
@@ -946,7 +898,7 @@ function displayTutorial(n) {
 		$("#tutorialReminder").css({'left':leftoff,'display':'block','opacity':1});
 		setTimeout(function(){ $("#tutorialReminder").css('opacity','0'); }, 1000);
 		setTimeout(function(){ $("#tutorialReminder").css('display','none'); }, 5000);
-		*/
+		*//*
 
 		//replaytutorial
 		//$(".tutorialSelected").addClass("smallcontainerafter").removeClass("tutorialSelected");
@@ -956,4 +908,4 @@ function displayTutorial(n) {
 	return null;
 
 }
-
+*/

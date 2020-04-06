@@ -161,7 +161,7 @@ table div {
 	text-align:right;
 }
 a#runsim {
-	width:300px;
+	width:500px;
 	/*
 	margin-left:800px;
 	width:100%;
@@ -169,7 +169,7 @@ a#runsim {
 	*/
 	height:50px;
 	line-height:50px;
-	border:1px solid #ddd;
+	border:1px solid #aaa;
 	border-radius:3px;
 	transition:.2s;
 	text-align:center;
@@ -177,7 +177,7 @@ a#runsim {
 	text-decoration:none;
 	color:#666;
 	font-weight:bold;
-	background:#eee;
+	background:#fff;/*eee*/
 }
 a#runsim:hover {
 	background:#7FFFD4;
@@ -329,7 +329,7 @@ input.bottone {
 	color:#666;
 	padding:15px;
 	margin:0px 5px 0px 0px;
-	border:1px solid #ddd;
+	border:1px solid #aaa;
 	min-width:100px;
 	display:inline-block;
 	-webkit-transition: .2s;
@@ -349,19 +349,26 @@ input.bottone:hover {
 	display:block;
 	padding-bottom:5px;
 }
-input.scenariooptions {
+input.scenariooptions, input.scenariooptionsdefault {
 	color:#666;
 	padding:4px;
 	border:1px solid #ddd;
-	border-right:0px;
 	min-width:100px;
 	margin:0px 0px 0px 0px;
 	display:inline-block;
 	-webkit-transition:.2s;
 	transition:.2s;
-	border-radius:5px 0px 0px 5px;
+	line-height:15px;
 }
-input.scenariooptions:hover {
+input.scenariooptions {
+	border-radius:5px 0px 0px 5px;
+	border-right:0px;
+}
+input.scenariooptionsdefault {
+	border-radius:5px;
+	margin:0px 5px 0px 0px;
+}
+input.scenariooptions:hover,input.scenariooptionsdefault:hover {
 	background:#7FFFD4;
 	/*background:#007;*/
 }

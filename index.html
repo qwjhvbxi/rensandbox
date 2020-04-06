@@ -27,8 +27,8 @@
 	<script type="text/javascript" src="utils/Chart.min.js"></script>
 	
 	<script type="text/javascript" src="input-defaults.js"></script>
-	<script type="text/javascript" src="general-functions.js"></script>
 	<script type="text/javascript" src="general-tools.js"></script>
+	<script type="text/javascript" src="general-functions.js"></script>
 	
 	<script id="MathJax-script" async  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
@@ -127,7 +127,27 @@
 						<input class="ranges" title="G2" id="P2GStorageCapacity" type="range" min="0" max="100000" step="100" value="" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					
+					
 					<tr/>
+					<!--
+					<td>Storage</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td class="leftborder">Power<div><span id="H1"></span> GW</div>
+						<input class="ranges" title="H1" id="PHSPowerCapacity" type="range" min="0" max="10" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td>Storage<div><span id="H2"></span> GWh</div>
+						<input class="ranges" title="H2" id="PHSStorageCapacity" type="range" min="0" max="50" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td class="leftborder">Power<div><span id="G1"></span> GW</div>
+						<input class="ranges" title="G1" id="P2GPowerCapacity" type="range" min="0" max="100" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td>Storage<div><span id="G2"></span> GWh</div>
+						<input class="ranges" title="G2" id="P2GStorageCapacity" type="range" min="0" max="100000" step="100" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					
+					<tr/>-->
 					
 					<td class="economic">Installation cost</td>
 					<td class="economic"><div><span id="S3"></span> $/kW</div>
@@ -139,22 +159,22 @@
 					<td class="economic"><div><span id="N3"></span> $/kW</div>
 						<input class="ranges" title="N3" id="NuclearCapitalCost" type="range" min="100" max="10000" step="10" value="" oninput="$('#N3').html( this.value );">
 					</td>
-					<td class="economic leftborder">Power<div><span id="H4"></span> $/kW</div>
+					<td class="economic leftborder">Power<div><span id="H4"></span> $/kW</div><!--IN-->
 						<input class="ranges" title="H4" id="PHSCapitalCost" type="range" min="10" max="10000" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
-					<td class="economic">Storage<div><span id="H5"></span> $/kWh</div>
+					<td class="economic">Storage<div><span id="H5"></span> $/kWh</div><!--OUT-->
 						<input class="ranges" title="H5" id="PHSCapitalCostStorage" type="range" min="50" max="500" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
-					<td class="economic leftborder">Power<div><span id="G4"></span> $/kW</div>
+					<td class="economic leftborder">Power<div><span id="G4"></span> $/kW</div><!--IN-->
 						<input class="ranges" title="G4" id="P2GCapitalCost" type="range" min="10" max="10000" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
-					<td class="economic">Storage<div><span id="G5"></span> $/kWh</div>
+					<td class="economic">Storage<div><span id="G5"></span> $/kWh</div><!--OUT-->
 						<input class="ranges" title="G5" id="P2GCapitalCostStorage" type="range" min="0" max="500" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					
 					<tr/>
 					
-					<td id="genchar">Generation <br/>characteristics</td>
+					<td id="genchar">Generation <br/>characteristics</td><!--Other costs-->
 					<td class="economic">Variable cost<div><span id="S4"></span> $/kWh</div>
 						<input class="ranges" title="S4" id="SolarVariableCost" type="range" min="0" max="0.1" step="0.001" value="" oninput="$('#S4').html( this.value );">
 					</td>
@@ -164,11 +184,11 @@
 					<td class="economic">Variable cost<div><span id="N4"></span> $/kWh</div>
 						<input class="ranges" title="N4" id="NuclearVariableCost" type="range" min="0" max="0.2" step="0.001" value="" oninput="$('#N4').html( this.value );">
 					</td>
-					<td class="leftborder">Round-trip efficiency<div><span id="H3"></span>%</div>
+					<td class="leftborder">Round-trip efficiency<div><span id="H3"></span>%</div><!--storage cost-->
 						<input class="ranges" title="H3" id="PHSEfficiency" type="range" min="1" max="100" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td></td>
-					<td class="leftborder">Round-trip efficiency<div><span id="G3"></span>%</div>
+					<td class="leftborder">Round-trip efficiency<div><span id="G3"></span>%</div><!--storage cost-->
 						<input class="ranges" title="G3" id="P2GEfficiency" type="range" min="1" max="100" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td></td>
@@ -196,7 +216,7 @@
 				</table>
 				
 				<div id="advancedoption">
-					<div><label class="switch"><input type="checkbox" id="advancedcontroloption" checked><span class="slider"></span></label> economic data controls</div>
+					<div><label class="switch"><input type="checkbox" id="advancedcontroloption" checked><span class="slider"></span></label> advanced inputs</div>
 					<a id="runsim" href="#chartpanel" onclick="changeState(generateLoad)">Run simulation</a>
 				</div>
 				
@@ -204,11 +224,12 @@
 					
 					<h2>Scenario manager</h2>
 					<div id="inputPresets"></div>
-					<input class='bottone' type="submit" value="save current scenario" onclick="displaySave()"/><input class='bottone' type="submit" value="reset to defaults" onclick="initializeCaps(-2)"/>
+					<input class='bottone' type="submit" value="save current scenario" onclick="displaySave()"/><input class='bottone' type="submit" value="reset to defaults" onclick="initializeCaps(2)"/>
 					
 					<div id="savePane">
-						<input type="text" id="saveScenarioName" placeholder="scenario name"></input><input type="submit" onclick="saveScenario()" value="save"></input><input type="submit" onclick="$('#savePane').css('display','none');" value="close"></input>
+						<input type="text" id="saveScenarioName" placeholder="scenario name"></input>
 						<textarea id="saveScenarioComment" placeholder="Comments"></textarea>
+						<input type="submit" onclick="saveScenario()" value="save"></input><input type="submit" onclick="$('#savePane').css('display','none');" value="close"></input>
 					</div>
 				</div>
 			</div>
@@ -278,7 +299,7 @@
 		Data from <a target="_blank" href="https://transparency.entsoe.eu/">ENTSO-E transparency platform</a> 
 		| Version <span id="VersionNo"></span> 
 		| &copy; 2020 <a target="_blank" href="http://riccardoiacobucci.com">Riccardo Iacobucci</a> 
-		| <a target="_blank" href="https://github.com/qwjhvbxi/rensandbox/issues">Report an issue</a>
+		| <a target="_blank" href="https://github.com/qwjhvbxi/rensandbox/issues">Report an issue or suggestion</a>
 	</div>
 
 </div>
