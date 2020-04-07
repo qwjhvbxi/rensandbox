@@ -58,6 +58,7 @@ function initializeScenario() {
 	document.getElementById('stackedopt').addEventListener('change',function() {
 		UserOptions.Stacked=document.getElementById("stackedopt").checked;
 		localStorage.setItem('UserOptions', JSON.stringify(UserOptions));
+		initialDateWindow=g1.dateWindow_;
 		changeState(drawCharts)
 	});
 	document.getElementById('advancedcontroloption').addEventListener('change',function() {
@@ -563,6 +564,9 @@ function drawCharts() {
 		if (e.shiftKey || e.altKey) { attivato=1 }
 	});
 	
+	if (typeof initialDateWindow !== 'undefined')  {
+		zoomGraphX(initialDateWindow[0], initialDateWindow[1]);
+	}
 }
 
 // check mouseup events for updating graph from Range selector
@@ -573,6 +577,14 @@ function checkPointer(){
 		adaptRes();
 		attivato=0;
 	}
+}
+
+function zoomGraphX(minDate, maxDate) {
+	g1.updateOptions({
+		dateWindow: [minDate, maxDate]
+	});
+	adaptRes();
+	//showXDimensions(minDate, maxDate);
 }
 
 function adaptRes(minDate, maxDate, yRanges) {

@@ -1,4 +1,9 @@
-
+function zoomGraphX(minDate, maxDate) {
+	g.updateOptions({
+	  dateWindow: [minDate, maxDate]
+	});
+	showXDimensions(minDate, maxDate);
+}
 
 
 function get(url) {

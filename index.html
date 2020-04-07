@@ -114,6 +114,21 @@
 					<td><div><span id="N1"></span> GW (<span id="N2"></span>%)</div>
 						<input class="ranges" title="N1" id="NuclearPowerCapacity" type="range" min="0" max="200" step="1" value="" oninput="$('#N1').html( this.value );$('#N2').html( Math.round(this.value*NuclearDemandPerc*10)/10 ) ">
 					</td>
+					
+					<!--
+					<td class="leftborder">Power in<div><span id="H1"></span> GW</div>
+						<input class="ranges" title="H1" id="PHSPowerCapacityIn" type="range" min="0" max="10" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td>Power out<div><span id="H2"></span> GW</div>
+						<input class="ranges" title="H2" id="PHSPowerCapacityOut" type="range" min="0" max="10" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td class="leftborder">Power in<div><span id="G1"></span> GW</div>
+						<input class="ranges" title="G1" id="P2GPowerCapacityIn" type="range" min="0" max="100" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td>Power out<div><span id="G2"></span> GW</div>
+						<input class="ranges" title="G2" id="P2GPowerCapacityOut" type="range" min="0" max="100" step="100" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<!---->
 					<td class="leftborder">Power<div><span id="H1"></span> GW</div>
 						<input class="ranges" title="H1" id="PHSPowerCapacity" type="range" min="0" max="10" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
@@ -126,9 +141,11 @@
 					<td>Storage<div><span id="G2"></span> GWh</div>
 						<input class="ranges" title="G2" id="P2GStorageCapacity" type="range" min="0" max="100000" step="100" value="" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
+					<!---->
 					
 					
 					<tr/>
+					
 					<!--
 					<td>Storage</td>
 					<td></td>
@@ -159,16 +176,32 @@
 					<td class="economic"><div><span id="N3"></span> $/kW</div>
 						<input class="ranges" title="N3" id="NuclearCapitalCost" type="range" min="100" max="10000" step="10" value="" oninput="$('#N3').html( this.value );">
 					</td>
-					<td class="economic leftborder">Power<div><span id="H4"></span> $/kW</div><!--IN-->
-						<input class="ranges" title="H4" id="PHSCapitalCost" type="range" min="10" max="10000" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
+					
+					<!--
+					<td class="economic leftborder">Power in<div><span id="H4"></span> $/kW</div>
+						<input class="ranges" title="H4" id="PHSCapitalCostIn" type="range" min="10" max="10000" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
-					<td class="economic">Storage<div><span id="H5"></span> $/kWh</div><!--OUT-->
-						<input class="ranges" title="H5" id="PHSCapitalCostStorage" type="range" min="50" max="500" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
+					<td class="economic">Power out<div><span id="H5"></span> $/kWh</div>
+						<input class="ranges" title="H5" id="PHSCapitalCostOut" type="range" min="50" max="500" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
-					<td class="economic leftborder">Power<div><span id="G4"></span> $/kW</div><!--IN-->
+					<td class="economic leftborder">Power<div><span id="G4"></span> $/kW</div>
 						<input class="ranges" title="G4" id="P2GCapitalCost" type="range" min="10" max="10000" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
-					<td class="economic">Storage<div><span id="G5"></span> $/kWh</div><!--OUT-->
+					<td class="economic">Storage<div><span id="G5"></span> $/kWh</div>
+						<input class="ranges" title="G5" id="P2GCapitalCostStorage" type="range" min="0" max="500" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					-->
+					
+					<td class="economic leftborder">Power<div><span id="H4"></span> $/kW</div>
+						<input class="ranges" title="H4" id="PHSCapitalCost" type="range" min="10" max="10000" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td class="economic">Storage<div><span id="H5"></span> $/kWh</div>
+						<input class="ranges" title="H5" id="PHSCapitalCostStorage" type="range" min="50" max="500" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td class="economic leftborder">Power<div><span id="G4"></span> $/kW</div>
+						<input class="ranges" title="G4" id="P2GCapitalCost" type="range" min="10" max="10000" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td class="economic">Storage<div><span id="G5"></span> $/kWh</div>
 						<input class="ranges" title="G5" id="P2GCapitalCostStorage" type="range" min="0" max="500" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					
