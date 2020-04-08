@@ -13,6 +13,7 @@ Scenarios=[
 		Active:true,
 		PHSPowerCapacity:[0,10,1],
 		PHSStorageCapacity:[0,50,1],
+		P2GStorageCapacity:[0,100000,100],
 	},
 	{
 		Name:'Japan (2018)',
@@ -20,6 +21,7 @@ Scenarios=[
 		Active:true,
 		PHSPowerCapacity:[0,30,1],
 		PHSStorageCapacity:[0,100,1],
+		P2GStorageCapacity:[0,200000,100],
 	},
 	{
 		Name:'Italy (2019)',
@@ -27,6 +29,7 @@ Scenarios=[
 		Active:false,
 		PHSPowerCapacity:[0,5,1],
 		PHSStorageCapacity:[0,20,1],
+		P2GStorageCapacity:[0,100000,100],
 	},
 ]
 
