@@ -478,7 +478,7 @@ function generateLoad() {
 	
 	drawCharts();
 	displayPie();
-	adaptRes(EpochStart,EpochEnd);
+	//adaptRes(EpochStart,EpochEnd);
 	
 	setTimeout(createLoadDuration([Solar,Wind,Nuclear,phsPower,p2gPower],['percentile','solar','wind','nuclear','PHS','P2G'],[colorCodes.Solar,colorCodes.Wind,colorCodes.Nuclear,colorCodes.PHS,colorCodes.P2G]), 50);
 	
@@ -583,7 +583,8 @@ function zoomGraphX(minDate, maxDate) {
 	g1.updateOptions({
 		dateWindow: [minDate, maxDate]
 	});
-	adaptRes();
+	console.log(minDate);
+	adaptRes(minDate,maxDate);
 	//showXDimensions(minDate, maxDate);
 }
 
@@ -594,6 +595,10 @@ function adaptRes(minDate, maxDate, yRanges) {
 		minDate=g1.dateWindow_[0];
 		maxDate=g1.dateWindow_[1];
 	}
+	
+	initialDateWindow=[minDate,maxDate];
+	
+	console.log(initialDateWindow);
 	
 	//console.log(maxDate-minDate)
 	var newData,newDataStacked,newDataStorage;
