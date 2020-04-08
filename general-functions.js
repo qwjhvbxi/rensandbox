@@ -30,31 +30,6 @@ function initializeApp() {
 	
 	updateSimplified();
 	
-}
-
-function initializeScenario() {
-	
-	CurrentScenario=UserOptions.Scenario;
-	FileName='data/'+Scenarios[CurrentScenario].FileName+'.csv';//'data/Germany_2015.csv';
-	
-	console.log(CurrentScenario)
-	for (var key in Scenarios[CurrentScenario]) {
-		if ($('#'+key) && Scenarios[CurrentScenario][key].length>1) {
-			$('#'+key).attr({
-			   "min" : Scenarios[CurrentScenario][key][0],
-			   "max" : Scenarios[CurrentScenario][key][1],
-			   "step": Scenarios[CurrentScenario][key][2],
-			});
-		}
-	}
-	
-
-	get(FileName).then(function(response) {
-		changeState(generateLoad);
-	}, function(error) {
-		console.error("Failed!", error);
-	})
-
 	document.getElementById('stackedopt').addEventListener('change',function() {
 		UserOptions.Stacked=document.getElementById("stackedopt").checked;
 		localStorage.setItem('UserOptions', JSON.stringify(UserOptions));
@@ -66,6 +41,31 @@ function initializeScenario() {
 		localStorage.setItem('UserOptions', JSON.stringify(UserOptions));
 		updateSimplified();
 	});
+	
+}
+
+function initializeScenario() {
+	
+	initialDateWindow=undefined;
+	
+	CurrentScenario=UserOptions.Scenario;
+	FileName='data/'+Scenarios[CurrentScenario].FileName+'.csv';//'data/Germany_2015.csv';
+	
+	for (var key in Scenarios[CurrentScenario]) {
+		if ($('#'+key) && Scenarios[CurrentScenario][key].length>1) {
+			$('#'+key).attr({
+			   "min" : Scenarios[CurrentScenario][key][0],
+			   "max" : Scenarios[CurrentScenario][key][1],
+			   "step": Scenarios[CurrentScenario][key][2],
+			});
+		}
+	}
+	
+	get(FileName).then(function(response) {
+		changeState(generateLoad);
+	}, function(error) {
+		console.error("Failed!", error);
+	})
 	
 	showScenarios();
 	
@@ -149,7 +149,6 @@ function changeScenario(S,DefaultS) {
 	showScenarios()
 	updateRanges()
 	
-	console.log(CapChoice);
 }
 
 function listCountries() {
@@ -274,7 +273,7 @@ function sendSaved(CC) {
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() {
 	if (this.readyState == 4 && this.status == 200) {
-		console.log(this.responseText);
+		console.log('Scenario saved');
 	}
 	};
 	xhttp.open("POST", "test.php", true);
@@ -583,7 +582,6 @@ function zoomGraphX(minDate, maxDate) {
 	g1.updateOptions({
 		dateWindow: [minDate, maxDate]
 	});
-	console.log(minDate);
 	adaptRes(minDate,maxDate);
 	//showXDimensions(minDate, maxDate);
 }
@@ -597,8 +595,6 @@ function adaptRes(minDate, maxDate, yRanges) {
 	}
 	
 	initialDateWindow=[minDate,maxDate];
-	
-	console.log(initialDateWindow);
 	
 	//console.log(maxDate-minDate)
 	var newData,newDataStacked,newDataStorage;
