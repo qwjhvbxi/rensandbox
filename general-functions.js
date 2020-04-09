@@ -520,7 +520,7 @@ function drawCharts() {
 	
 	g2=new Dygraph(
 	  document.getElementById("storage"),
-	  StorageData,
+	  StorageData96,
 	  {
 		customBars: false,
 		title: '',
