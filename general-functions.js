@@ -274,20 +274,26 @@ function sendSaved(CC) {
 	xhttp.onreadystatechange = function() {
 	if (this.readyState == 4 && this.status == 200) {
 		console.log('Scenario saved');
+		console.log(this.responseText);
 	}
 	};
 	xhttp.open("POST", "test.php", true);
 	xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	xhttp.send("savedScenario="+JSON.stringify(CC));
+	xhttp.send("savedScenario="+encodeURIComponent(JSON.stringify(CC)));
 }
 
 function deleteScenario(s) {
-	var r = confirm("Delete scenario '"+CapChoiceOptionsUser[s].Name+"'?");
+	var r = confirm("Delete scenario '"+alertSpecial(CapChoiceOptionsUser[s].Name)+"'?");
 	if (r == true) {
 		CapChoiceOptionsUser.splice(s,1);
 		localStorage.setItem('LastCapChoiceOptions', JSON.stringify(CapChoiceOptionsUser));
 		showScenarios()
 	}
+}
+
+function alertSpecial(msg) {
+    msg = $('<span/>').html(msg).text();
+    return msg;
 }
 
 function changeState(callback) {
