@@ -1,9 +1,8 @@
 
 // general info
 CurrentVersion=0.184;
-ShowRangeSelector=true;
+ShowRangeSelector=false;
 Simplified=0;
-// Files: column 0: Date; column 1: Load (MW); column 2: Solar (capacity factor); column 3: Wind (capacity factor)
 colorCodes={
 	Solar:"#aaaa00",
 	Wind:"#00aa33",
@@ -20,14 +19,11 @@ colorCodes={
 
 function initializeApp() {
 
-	initializeCaps(1);
-	
 	$("#VersionNo").html(CurrentVersion);
 	
+	initializeCaps(1);
 	listCountries();
-	
 	initializeScenario();
-	
 	updateSimplified();
 	
 	document.getElementById('stackedopt').addEventListener('change',function() {
@@ -46,10 +42,10 @@ function initializeApp() {
 
 function initializeScenario() {
 	
-	initialDateWindow=undefined;
+	initialDateWindow=undefined; // reset zoom when changing countries
 	
 	CurrentScenario=UserOptions.Scenario;
-	FileName='data/'+Scenarios[CurrentScenario].FileName+'.csv';//'data/Germany_2015.csv';
+	FileName='data/'+Scenarios[CurrentScenario].FileName+'.csv';
 	
 	for (var key in Scenarios[CurrentScenario]) {
 		if ($('#'+key) && Scenarios[CurrentScenario][key].length>1) {
@@ -77,7 +73,6 @@ function initializeCaps(resetOption) {
 	// 1 gets localstorage if it exists
 	// 2 delete user scenarios with prompt
 	// 3 delete user scenarios directly
-	
 	
 	if (resetOption==1) {
 		
@@ -122,7 +117,7 @@ function initializeCaps(resetOption) {
 	}
 	
 	if (resetOption==3) {
-		CapChoiceOptionsUser = {};//JSON.parse(JSON.stringify(CapChoiceOptionsDefault))
+		CapChoiceOptionsUser=[];
 		localStorage.clear();
 		localStorage.setItem('UserOptions', JSON.stringify(UserOptions));
 		readOptions();
@@ -188,6 +183,8 @@ function updateRanges() {
 }
 
 function readOptions() {
+	// update Capchoice from user's range input
+	
 	var NewValue;
 	for (var key in CapChoice) {
 		if (typeof CapChoice[key] === 'object' && CapChoice[key] !== null) {
@@ -202,6 +199,8 @@ function readOptions() {
 }
 
 function writeOptions() {
+	// modify range inputs according to CapChoice
+	// modify checkboxes according to UserOptions
 	
 	for (var key in CapChoice) {
 		if (typeof CapChoice[key] === 'object' && CapChoice[key] !== null) {
@@ -213,7 +212,6 @@ function writeOptions() {
 	document.getElementById("stackedopt").checked=UserOptions.Stacked;
 	document.getElementById("advancedcontroloption").checked=UserOptions.Advanced;
 	$("#countryselect").val(UserOptions.Scenario.toString());
-	//$('#countryselect option[value='+UserOptions.Scenario.toString()+']').attr('selected','selected');
 }
 
 function updateSimplified() {
@@ -526,7 +524,7 @@ function drawCharts() {
 		title: '',
 		ylabel: 'Energy (GWh)',
 		legend: 'always',
-		showRangeSelector: false,//ShowRangeSelector,
+		showRangeSelector: ShowRangeSelector,
 		rangeSelectorHeight: 30,
 		labels: StorageLabels,
 		colors: StorageColors,
@@ -536,8 +534,6 @@ function drawCharts() {
 		labelsDiv:'storagelabels',
 		zoomCallback:adaptRes,
 		animatedZooms:false,
-		//rollPeriod: 14,
-		//showRoller: true,
 		/*
 		interactionModel : {
             'mousedown' : downV3,
@@ -656,7 +652,7 @@ function adaptRes(minDate, maxDate, yRanges) {
 		console.log(mezzo)
 		console.log(dopo)
 		*/
-		newData=prima.concat(mezzo,dopo);	
+		newData=prima.concat(mezzo,dopo);
 	}
 	
 	g1.updateOptions({'file': newData,});
@@ -845,95 +841,5 @@ function displayPie() {
 	});
 }
 
-/*
-function createMainMenu() {
-	var c=$('.contentpanel');
-	var m=$('#mainmenu');
-	var i;
-	var o;
-	m[0].textContent="";
-	for (let i=0;i<c.length;i++) {
-		//$(m[0]).html()
-		o=$("<div class='menuitem'>"+c[i].id+"</div>");
-		o.bind("click",function(){
-			updateTabs(i);
-		});
-		$(m[0]).append(o);
-	}
-	updateTabs(0);
-}
 
-function updateTabs(num) {
-	//resize();
-	$('.contentpanel').css('display','none');
-	$('.contentpanel')[num].style.display="block";	
-	$('.menuitem').removeClass('menuitemactive');
-	$($('.menuitem')[num]).addClass('menuitemactive');
-}
 
-function displayTutorial(n) {
-
-	updateTabs(0);
-
-	$('#savePane').css("display","none");
-	var c = $("#tutorials div");
-	c.css("display","none");
-	$(".tutorialSelected").addClass("smallcontainerafter").removeClass("tutorialSelected");
-
-	if (c[n]) {
-		$(".smallcontainerafter").addClass("smallcontainer").removeClass("smallcontainerafter");
-		var Block=c[n];
-		Block.style.display="block";
-		
-		var Subje=document.getElementById(Block.title);
-		if (Subje) {
-			var SPos=Subje.getBoundingClientRect();
-			var w=window.innerWidth;
-			var h=window.innerHeight;
-			
-			// quadrants check
-			if (SPos.left+SPos.right>w) {
-				
-				if (SPos.top+SPos.bottom>h) {
-					Block.style.top=SPos.top+"px";
-					Block.style.left=SPos.left-530+"px";
-				} else {
-					Block.style.left=SPos.left+"px";
-					Block.style.top=SPos.bottom+"px";
-				}
-			} else {
-				Block.style.left=SPos.right+"px";
-				Block.style.top=SPos.top+"px";
-			}
-			Subje.className="tutorialSelected";	
-		}
-		
-		if ($(Block).find("span").length==0) {
-		var Prev=$('<span>back</span>').click(function(){displayTutorial(n-1);});
-		var Clos=$('<span>exit</span>').click(function(){displayTutorial(-1);});
-		var Next=$('<span>next</span>').click(function(){displayTutorial(n+1);});
-		//Block.addEventListener("click",function() {displayTutorial(n+1);});
-		Block.append(Prev[0],Clos[0],Next[0]);
-		}
-		
-	} else {
-		$(".smallcontainer").addClass("smallcontainerafter").removeClass("smallcontainer");
-		
-		/*
-		var bottone=$("#replaytutorial");
-		var offset = bottone.offset();
-		var leftoff=Math.round(offset.left+bottone.width()/2)+'px';
-		$("#tutorialReminder").css({'left':leftoff,'display':'block','opacity':1});
-		setTimeout(function(){ $("#tutorialReminder").css('opacity','0'); }, 1000);
-		setTimeout(function(){ $("#tutorialReminder").css('display','none'); }, 5000);
-		*//*
-
-		//replaytutorial
-		//$(".tutorialSelected").addClass("smallcontainerafter").removeClass("tutorialSelected");
-		//$("#tutorials").css("display","none");
-	}
-
-	return null;
-
-}
-*/

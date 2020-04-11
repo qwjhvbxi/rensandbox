@@ -1,4 +1,10 @@
+/*
+Scenario files should be stored in "data/" in csv format. 
 
+---file format---
+First line is ignored.
+Column 0: Date ("YYYY/MM/DD HH:mm"); column 1: Load (MW); column 2: Solar (capacity factor); column 3: Wind (capacity factor)
+*/
 
 UserOptions={
 	Stacked:true,
