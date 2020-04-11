@@ -289,11 +289,6 @@ function deleteScenario(s) {
 	}
 }
 
-function alertSpecial(msg) {
-    msg = $('<span/>').html(msg).text();
-    return msg;
-}
-
 function changeState(callback) {
 	showMask2();
 	setTimeout(callback, 50);
@@ -305,22 +300,24 @@ function showMask2() {
 
 function generateLoad() {
 	
+	var i,p2gPowerHigh,p2gPowerLow;	
+	
 	readOptions()
 	ThisData=EnergyData.data;
 	localStorage.setItem('LastCapChoice', JSON.stringify(CapChoice));
 	
+	// simulation interval length (ms)
 	EpochStart=ThisData[0][0].getTime();
 	EpochEnd=ThisData[ThisData.length-1][0].getTime();
 	EpochL=EpochEnd-EpochStart;
 	
 	var Resolution=Math.round(EpochL/ThisData.length/1000/60); // time resolution in minutes
-	HR=60/Resolution;
-	var i,p2gPowerHigh,p2gPowerLow;	
+	HR=60/Resolution; // data points in one hour
 	
+	// initialize variables
 	PowerData=[];
 	PowerDataStacked=[];
 	StorageData=[];
-	
 	Solar=[];
 	Wind=[];
 	Nuclear=[];
@@ -328,39 +325,43 @@ function generateLoad() {
 	Surplus=[];
 	Unserved=[];
 	Generation=[];
-	
 	phsPower=[];
 	phsPowerGen=[];
 	phsStorage=[];
-	phsStorage[0]=CapChoice.PHS.StorageCapacity/2;
-	
 	p2gPower=[];
 	p2gPowerGen=[];
 	p2gStorage=[];
-	p2gStorage[0]=CapChoice.P2G.StorageCapacity/2;
 	
+	// calculate capital costs
 	CapitalCost=CapChoice.Nuclear.CapitalCost*CapChoice.Nuclear.PowerCapacity/CapChoice.Nuclear.LifeSpan;
 	CapitalCost+=CapChoice.Solar.CapitalCost*CapChoice.Solar.PowerCapacity/CapChoice.Solar.LifeSpan;
 	CapitalCost+=CapChoice.Wind.CapitalCost*CapChoice.Wind.PowerCapacity/CapChoice.Wind.LifeSpan;
 	CapitalCost+=(CapChoice.PHS.CapitalCost*CapChoice.PHS.PowerCapacity+CapChoice.PHS.CapitalCostStorage*CapChoice.PHS.StorageCapacity)/CapChoice.PHS.LifeSpan;
 	CapitalCost+=(CapChoice.P2G.CapitalCost*CapChoice.P2G.PowerCapacity+CapChoice.P2G.CapitalCostStorage*CapChoice.P2G.StorageCapacity)/CapChoice.P2G.LifeSpan;	
+	
+	// set initial storage level
+	phsStorage[0]=CapChoice.PHS.StorageCapacity/2;
+	p2gStorage[0]=CapChoice.P2G.StorageCapacity/2;
 			
 	for (i=0,itot=ThisData.length;i<itot;i++) {
 		
-		Load[i]=ThisData[i][1]/1000;
-		
-		Solar[i]=ThisData[i][2]*CapChoice.Solar.PowerCapacity;
+		Load[i]=ThisData[i][1]/1000; // Load is given in MW, convert to GW
+		Solar[i]=ThisData[i][2]*CapChoice.Solar.PowerCapacity; // solar and wind in capacity factors, so just multiply
 		Wind[i]=ThisData[i][3]*CapChoice.Wind.PowerCapacity;
 		
+		// calculate limits for in/out of storage
 		phsPowerHigh=Math.min(phsStorage[i]*(CapChoice.PHS.Efficiency/100),CapChoice.PHS.PowerCapacity); // generation
 		phsPowerLow=Math.max(phsStorage[i]-CapChoice.PHS.StorageCapacity,-CapChoice.PHS.PowerCapacity) // storage
 		p2gPowerHigh=Math.min(p2gStorage[i]*(CapChoice.P2G.Efficiency/100),CapChoice.P2G.PowerCapacity); // generation
 		p2gPowerLow=Math.max(p2gStorage[i]-CapChoice.P2G.StorageCapacity,-CapChoice.P2G.PowerCapacity) // storage
 		
+		// nuclear generation
 		Nuclear[i]=Math.max(0,Math.min(Load[i]-phsPowerLow-p2gPowerLow-Solar[i]-Wind[i],CapChoice.Nuclear.PowerCapacity));
 		
+		// total generation
 		Generation[i]=Solar[i]+Wind[i]+Nuclear[i];
 		
+		// calculate storage
 		phsPower[i]=Math.max(phsPowerLow,Math.min(phsPowerHigh,Load[i]-Generation[i]));
 		phsPowerGen[i]=Math.max(0,phsPower[i]);
 		phsStorage[i+1]=Math.max(0,phsStorage[i]-phsPowerGen[i]/(CapChoice.PHS.Efficiency/100)-Math.min(0,phsPower[i]));
@@ -372,7 +373,7 @@ function generateLoad() {
 		Surplus[i]=Math.max(0,-Load[i]+Generation[i]+phsPower[i]+p2gPower[i]);
 		Unserved[i]=Math.max(0,Load[i]-Generation[i]-phsPower[i]-p2gPower[i]);
 		
-		// 1: solar; 2: wind; 3: load
+		// setup graph variables
 		PowerLabels=[ "Date", "Solar","Wind","Nuclear","Load","PHS","P2G"];
 		PowerColors=[ colorCodes.Solar,colorCodes.Wind,colorCodes.Nuclear,colorCodes.Load,colorCodes.PHS,colorCodes.P2G]
 		PowerData[i]=[];
@@ -384,18 +385,19 @@ function generateLoad() {
 		PowerData[i][5]=phsPower[i];
 		PowerData[i][6]=p2gPower[i];
 		
+		// setup stacked graph variables
 		PowerStackedLabels=[ "Date","Unserved","P2G","PHS","Solar","Wind","Nuclear"];
 		PowerStackedColors=[ colorCodes.Unserved,colorCodes.P2G,colorCodes.PHS,colorCodes.Solar,colorCodes.Wind,colorCodes.Nuclear];
 		PowerDataStacked[i]=[];
 		PowerDataStacked[i][0]=ThisData[i][0];
 		PowerDataStacked[i][1]=Unserved[i];
-		//PowerDataStacked[i][2]=Surplus[i];
 		PowerDataStacked[i][2]=p2gPowerGen[i];
 		PowerDataStacked[i][3]=phsPowerGen[i];
 		PowerDataStacked[i][4]=Solar[i];
 		PowerDataStacked[i][5]=Wind[i];
 		PowerDataStacked[i][6]=Nuclear[i];
 		
+		// setup storage graph variables
 		StorageLabels=[ "Date", "PHS storage", "P2G storage"];
 		StorageColors=[colorCodes.PHS,colorCodes.P2G];
 		StorageData[i]=[];
@@ -405,6 +407,7 @@ function generateLoad() {
 		
 	}
 	
+	// calculate totals
 	Total=[];
 	Total.Load=Load.reduce(sumFun);
 	Total.Solar=Solar.reduce(sumFun);
@@ -415,6 +418,7 @@ function generateLoad() {
 	Total.Unserved=Unserved.reduce(sumFun);
 	Total.Surplus=Surplus.reduce(sumFun);
 	
+	// calculate peaks
 	Peak=[];
 	Peak.Load=Math.max.apply(Math, Load);
 	Peak.Solar=Math.max.apply(Math, Solar);
@@ -437,8 +441,10 @@ function generateLoad() {
 	WindDemandPerc=Total.Wind/CapChoice.Wind.PowerCapacity/Total.Load*100;
 	NuclearDemandPerc=1/(Total.Load/Load.length)*100;
 	
+	// update ranges with demand percentages
 	updateRanges();
 	
+	// update results table
 	var c=$(".results");
 	var k,t;
 	for (t=c.length,k=0;k<t;k++) {
@@ -447,42 +453,38 @@ function generateLoad() {
 		<div class='infoNumbers'><p><span>"+(Math.round(Total[c[k].title]/Total.Load*1000)/10).toFixed(1)+"%</span></p><p><span>"+Math.round(Total[c[k].title]/1000/HR)+"</span>\
 		</p><p><span>"+Math.round(Peak[c[k].title])+"</span></p></div>");
 	}
-	
 	$("#costperyear").html(Math.round((CapitalCost+VariableCost)/100)/10)
 	//$("#costperyeardot").css("transform","scale("+Math.sqrt((CapitalCost+VariableCost)/1e5)+")");
-	
-	//<span class='dot' style='background-color:"+colorCodes[c[k].title]+";transform:scale("+Math.sqrt((Total[c[k].title])/Total.Load)+")'></span>
 	$("#costperkwh").html((Math.round((CapitalCost+VariableCost)/((Total.Load-Total.Unserved)/HR)*100)/100).toFixed(2))
 	$("#costperkwhdot").css("transform","scale("+Math.sqrt(((CapitalCost+VariableCost)/((Total.Load-Total.Unserved)/HR))/(0.2))+")");
 	
+	// add red text and warning if there is unserved demand
 	if (Total.Unserved>0) {
 		$("#resultsContainer2").addClass("Alert");
 	}else{
 		$("#resultsContainer2").removeClass("Alert");
 	}
 	
+	// show chart and results containers when initializing
 	$("#plots").css({"visibility":"visible"});
 	$("#resultsContainer2").css({"visibility":"visible"});
 
+	// calculate coarse graph data for fast rendering when zoomed out
 	var LevelCoarse=Math.round(24*60/Resolution);
-	var LevelMedium=Math.round(3*60/Resolution);
-	
+	var LevelMedium=Math.round(3*60/Resolution);	
 	PowerData96=downsample(PowerData,LevelCoarse);
 	PowerData12=downsample(PowerData,LevelMedium);
 	PowerDataStacked96=downsample(PowerDataStacked,LevelCoarse);
 	PowerDataStacked12=downsample(PowerDataStacked,LevelMedium);
 	StorageData96=downsample(StorageData,LevelCoarse);
 	StorageData12=downsample(StorageData,LevelMedium);
-	
 	SpliceL=PowerData96.length;
-		
-	//EpochStart=new Date("2015/01/01 00:00:00").getTime();
-	//EpochEnd=new Date("2016/01/01 00:00:00").getTime();
 	
+	// create charts
 	drawCharts();
 	displayPie();
-	//adaptRes(EpochStart,EpochEnd);
 	
+	// create load duration plot
 	setTimeout(createLoadDuration([Solar,Wind,Nuclear,phsPower,p2gPower],['percentile','solar','wind','nuclear','PHS','P2G'],[colorCodes.Solar,colorCodes.Wind,colorCodes.Nuclear,colorCodes.PHS,colorCodes.P2G]), 50);
 	
 }
@@ -643,15 +645,6 @@ function adaptRes(minDate, maxDate, yRanges) {
 		var mezzo = newData.slice(VecStart,VecEnd);
 		var prima = baseData.slice(0, spliceStart);
 		var dopo = baseData.slice(spliceEnd);
-		/*
-		console.log(VecStart)
-		console.log(VecEnd)
-		console.log(spliceStart)
-		console.log(spliceEnd)
-		console.log(prima)
-		console.log(mezzo)
-		console.log(dopo)
-		*/
 		newData=prima.concat(mezzo,dopo);
 	}
 	
@@ -686,12 +679,10 @@ function createLoadDuration(data,LabelIn,ColorsIn) {
 				Counter=Counter+h[i][J][1];
 			}
 			res[k][i+1]=h[i][J][0];
-			//if (i==2) {console.log(k,J,h[i][J][0])}
 		}
 	}
 	
 	setTimeout(function(){ displayLoadDuration(res,LabelIn,ColorsIn) },500);
-	//return res;
 	
 }
 
@@ -707,7 +698,7 @@ function displayLoadDuration(data2,LabelIn,ColorsIn) {
 		data2,
 		{
 		customBars: false,
-		title: '',//'Daily Temperatures in New York vs. San Francisco',
+		title: '',
 		ylabel: 'Power (GW)',
 		legend: 'always',
 		legendFormatter:legendFormatter ,

@@ -123,3 +123,9 @@ function downsample(data,num) {
 	return res;
 	
 }
+
+
+function alertSpecial(msg) {
+    msg = $('<span/>').html(msg).text();
+    return msg;
+}
