@@ -118,7 +118,7 @@ input {
 #mask img {
     vertical-align: middle;
 }
-#loader {
+.loader {
 	position:absolute;
 	width:100%;
 	top:50%;

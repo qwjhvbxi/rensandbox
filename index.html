@@ -19,16 +19,16 @@
 	<link rel="stylesheet" type="text/css" href="utils/Chart.min.css">
 	<link rel="icon" href="favicon.png">
 
-	<script type="text/javascript" src="utils/jquery-3.4.1.min.js"></script>
-	<script type="text/javascript" src="utils/dygraph.min.js"></script>
-	<script type="text/javascript" src="utils/synchronizer.js"></script>
-	<script type="text/javascript" src="utils/papaparse.min.js"></script>
-	<script type="text/javascript" src="utils/interaction-api.js"></script>
-	<script type="text/javascript" src="utils/Chart.min.js"></script>
+	<script src="utils/jquery-3.4.1.min.js"></script>
+	<script src="utils/dygraph.min.js"></script>
+	<script src="utils/synchronizer.js"></script>
+	<script src="utils/papaparse.min.js"></script>
+	<script src="utils/interaction-api.js"></script>
+	<script src="utils/Chart.min.js"></script>
 	
-	<script type="text/javascript" src="input-defaults.js"></script>
-	<script type="text/javascript" src="general-tools.js"></script>
-	<script type="text/javascript" src="general-functions.js"></script>
+	<script src="input-defaults.js"></script>
+	<script src="general-tools.js"></script>
+	<script src="general-functions.js"></script>
 	
 	<script id="MathJax-script" async  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
@@ -75,15 +75,15 @@
 				<div class="Warn">Warning! Blackouts!</div>
 			</div>
 			<div id="graphsContainer">
-				<div id="mask"><img src="pics/Pedro_luis_romani_ruiz.gif"/></div>
+				<div id="mask"><img alt="Loading..." src="pics/Pedro_luis_romani_ruiz.gif"/></div>
 				<div id="plots" style="position:relative">
 					<div id="stackoption">
 						<label class="switch"><input type="checkbox" id="stackedopt"><span class="slider"></span></label><!-- stacked graph-->
 					</div>
 					<div id="powerlabels"></div>
-					<div id="powerchart"><div id="loader">Loading data files...</div></div>
+					<div id="powerchart"><div class="loader">Loading data files...</div></div>
 					<div id="storagelabels"></div>
-					<div id="storage"><div id="loader">Loading data files...</div></div>
+					<div id="storage"><div class="loader">Loading data files...</div></div>
 				</div>
 			</div>
 		</div>
@@ -91,6 +91,7 @@
 			<div class="contentpanel" id="input">
 			
 				<table>
+				<tr>
 					<td></td>
 					<td colspan=3><h2>Generation</h2></td>
 					<td colspan=4><h2>Storage</h2></td>
@@ -102,150 +103,155 @@
 					<th colspan=2 class="leftborder"><abbr title="Pumped hydro storage"><a target="_blank" href="https://en.wikipedia.org/wiki/Pumped-storage_hydroelectricity">PHS</a></abbr></th>
 					<th colspan=2 class="leftborder"><abbr title="Power2gas"><a target="_blank" href="https://en.wikipedia.org/wiki/Power-to-gas">P2G</a></abbr></th>
 					
-					<tr/>
+				</tr>
+				<tr>
 					
 					<td>Installed capacity</td>
 					<td><div><span id="S1"></span> GW (<span id="S2"></span>%)</div>
-						<input class="ranges" title="S1" id="SolarPowerCapacity" type="range" min="0" max="500" step="1" value="" oninput="$('#S1').html( this.value );$('#S2').html( Math.round(this.value*SolarDemandPerc*10)/10 ) ">
+						<input class="ranges" title="S1" id="SolarPowerCapacity" type="range" min="0" max="500" step="1" oninput="$('#S1').html( this.value );$('#S2').html( Math.round(this.value*SolarDemandPerc*10)/10 ) ">
 					</td>
 					<td><div><span id="W1"></span> GW (<span id="W2"></span>%)</div>
-						<input class="ranges" title="W1" id="WindPowerCapacity" type="range" min="0" max="500" step="1" value="" oninput="$('#W1').html( this.value );$('#W2').html( Math.round(this.value*WindDemandPerc*10)/10  ) ">
+						<input class="ranges" title="W1" id="WindPowerCapacity" type="range" min="0" max="500" step="1" oninput="$('#W1').html( this.value );$('#W2').html( Math.round(this.value*WindDemandPerc*10)/10  ) ">
 					</td>
 					<td><div><span id="N1"></span> GW (<span id="N2"></span>%)</div>
-						<input class="ranges" title="N1" id="NuclearPowerCapacity" type="range" min="0" max="200" step="1" value="" oninput="$('#N1').html( this.value );$('#N2').html( Math.round(this.value*NuclearDemandPerc*10)/10 ) ">
+						<input class="ranges" title="N1" id="NuclearPowerCapacity" type="range" min="0" max="200" step="1" oninput="$('#N1').html( this.value );$('#N2').html( Math.round(this.value*NuclearDemandPerc*10)/10 ) ">
 					</td>
 					
 					<!--
 					<td class="leftborder">Power in<div><span id="H1"></span> GW</div>
-						<input class="ranges" title="H1" id="PHSPowerCapacityIn" type="range" min="0" max="10" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="H1" id="PHSPowerCapacityIn" type="range" min="0" max="10" step="1" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td>Power out<div><span id="H2"></span> GW</div>
-						<input class="ranges" title="H2" id="PHSPowerCapacityOut" type="range" min="0" max="10" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="H2" id="PHSPowerCapacityOut" type="range" min="0" max="10" step="1" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td class="leftborder">Power in<div><span id="G1"></span> GW</div>
-						<input class="ranges" title="G1" id="P2GPowerCapacityIn" type="range" min="0" max="100" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="G1" id="P2GPowerCapacityIn" type="range" min="0" max="100" step="1" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td>Power out<div><span id="G2"></span> GW</div>
-						<input class="ranges" title="G2" id="P2GPowerCapacityOut" type="range" min="0" max="100" step="100" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="G2" id="P2GPowerCapacityOut" type="range" min="0" max="100" step="100" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
-					<!---->
+					-->
 					<td class="leftborder">Power<div><span id="H1"></span> GW</div>
-						<input class="ranges" title="H1" id="PHSPowerCapacity" type="range" min="0" max="10" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="H1" id="PHSPowerCapacity" type="range" min="0" max="10" step="1" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td>Storage<div><span id="H2"></span> GWh</div>
-						<input class="ranges" title="H2" id="PHSStorageCapacity" type="range" min="0" max="50" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="H2" id="PHSStorageCapacity" type="range" min="0" max="50" step="1" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td class="leftborder">Power<div><span id="G1"></span> GW</div>
-						<input class="ranges" title="G1" id="P2GPowerCapacity" type="range" min="0" max="100" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="G1" id="P2GPowerCapacity" type="range" min="0" max="100" step="1" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td>Storage<div><span id="G2"></span> GWh</div>
-						<input class="ranges" title="G2" id="P2GStorageCapacity" type="range" min="0" max="100000" step="100" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="G2" id="P2GStorageCapacity" type="range" min="0" max="100000" step="100" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
-					<!---->
 					
 					
-					<tr/>
+					
+				</tr>
+				<tr>
 					
 					<!--
 					<td>Storage</td>
 					<td></td>
 					<td></td>
 					<td></td>
-					<td class="leftborder">Power<div><span id="H1"></span> GW</div>
-						<input class="ranges" title="H1" id="PHSPowerCapacity" type="range" min="0" max="10" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+					<td class="leftborder">Storage<div><span id="H2"></span> GWh</div>
+						<input class="ranges" title="H2" id="PHSStorageCapacity" type="range" min="0" max="50" step="1" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
-					<td>Storage<div><span id="H2"></span> GWh</div>
-						<input class="ranges" title="H2" id="PHSStorageCapacity" type="range" min="0" max="50" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+					<td>Round-trip efficiency<div><span id="H3"></span>%</div>
+						<input class="ranges" title="H3" id="PHSEfficiency" type="range" min="1" max="100" step="1" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
-					<td class="leftborder">Power<div><span id="G1"></span> GW</div>
-						<input class="ranges" title="G1" id="P2GPowerCapacity" type="range" min="0" max="100" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+					<td class="leftborder">Storage<div><span id="G2"></span> GWh</div>
+						<input class="ranges" title="G2" id="P2GStorageCapacity" type="range" min="0" max="100000" step="100" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
-					<td>Storage<div><span id="G2"></span> GWh</div>
-						<input class="ranges" title="G2" id="P2GStorageCapacity" type="range" min="0" max="100000" step="100" value="" oninput="$('#'+this.title).html( this.value ); ">
+					<td>Round-trip efficiency<div><span id="G3"></span>%</div>
+						<input class="ranges" title="G3" id="P2GEfficiency" type="range" min="1" max="100" step="1" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					
 					<tr/>-->
 					
 					<td class="economic">Installation cost</td>
 					<td class="economic"><div><span id="S3"></span> $/kW</div>
-						<input class="ranges" title="S3" id="SolarCapitalCost" type="range" min="10" max="2000" step="10" value="" oninput="$('#S3').html( this.value );">
+						<input class="ranges" title="S3" id="SolarCapitalCost" type="range" min="10" max="2000" step="10" oninput="$('#S3').html( this.value );">
 					</td>
 					<td class="economic"><div><span id="W3"></span> $/kW</div>
-						<input class="ranges" title="W3" id="WindCapitalCost" type="range" min="100" max="5000" step="10" value="" oninput="$('#W3').html( this.value );">
+						<input class="ranges" title="W3" id="WindCapitalCost" type="range" min="100" max="5000" step="10" oninput="$('#W3').html( this.value );">
 					</td>
 					<td class="economic"><div><span id="N3"></span> $/kW</div>
-						<input class="ranges" title="N3" id="NuclearCapitalCost" type="range" min="100" max="10000" step="10" value="" oninput="$('#N3').html( this.value );">
+						<input class="ranges" title="N3" id="NuclearCapitalCost" type="range" min="100" max="15000" step="100" oninput="$('#N3').html( this.value );">
 					</td>
 					
 					<!--
 					<td class="economic leftborder">Power in<div><span id="H4"></span> $/kW</div>
-						<input class="ranges" title="H4" id="PHSCapitalCostIn" type="range" min="10" max="10000" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="H4" id="PHSCapitalCostIn" type="range" min="10" max="10000" step="10" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td class="economic">Power out<div><span id="H5"></span> $/kWh</div>
-						<input class="ranges" title="H5" id="PHSCapitalCostOut" type="range" min="50" max="500" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="H5" id="PHSCapitalCostOut" type="range" min="50" max="500" step="10" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td class="economic leftborder">Power<div><span id="G4"></span> $/kW</div>
-						<input class="ranges" title="G4" id="P2GCapitalCost" type="range" min="10" max="10000" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="G4" id="P2GCapitalCost" type="range" min="10" max="10000" step="10" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td class="economic">Storage<div><span id="G5"></span> $/kWh</div>
-						<input class="ranges" title="G5" id="P2GCapitalCostStorage" type="range" min="0" max="500" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="G5" id="P2GCapitalCostStorage" type="range" min="0" max="500" step="10" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					-->
 					
 					<td class="economic leftborder">Power<div><span id="H4"></span> $/kW</div>
-						<input class="ranges" title="H4" id="PHSCapitalCost" type="range" min="10" max="10000" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="H4" id="PHSCapitalCost" type="range" min="10" max="10000" step="10" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td class="economic">Storage<div><span id="H5"></span> $/kWh</div>
-						<input class="ranges" title="H5" id="PHSCapitalCostStorage" type="range" min="50" max="500" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="H5" id="PHSCapitalCostStorage" type="range" min="50" max="500" step="10" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td class="economic leftborder">Power<div><span id="G4"></span> $/kW</div>
-						<input class="ranges" title="G4" id="P2GCapitalCost" type="range" min="10" max="10000" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="G4" id="P2GCapitalCost" type="range" min="10" max="10000" step="10" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td class="economic">Storage<div><span id="G5"></span> $/kWh</div>
-						<input class="ranges" title="G5" id="P2GCapitalCostStorage" type="range" min="0" max="500" step="10" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="G5" id="P2GCapitalCostStorage" type="range" min="0" max="200" step="5" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					
-					<tr/>
+				</tr>
+				<tr>
 					
 					<td id="genchar">Generation <br/>characteristics</td><!--Other costs-->
 					<td class="economic">Variable cost<div><span id="S4"></span> $/kWh</div>
-						<input class="ranges" title="S4" id="SolarVariableCost" type="range" min="0" max="0.1" step="0.001" value="" oninput="$('#S4').html( this.value );">
+						<input class="ranges" title="S4" id="SolarVariableCost" type="range" min="0" max="0.1" step="0.001" oninput="$('#S4').html( this.value );">
 					</td>
 					<td class="economic">Variable cost<div><span id="W4">0.01</span> $/kWh</div>
-						<input class="ranges" title="W4" id="WindVariableCost" type="range" min="0" max="0.1" step="0.001" value="" oninput="$('#W4').html( this.value );">
+						<input class="ranges" title="W4" id="WindVariableCost" type="range" min="0" max="0.1" step="0.001" oninput="$('#W4').html( this.value );">
 					</td>
 					<td class="economic">Variable cost<div><span id="N4"></span> $/kWh</div>
-						<input class="ranges" title="N4" id="NuclearVariableCost" type="range" min="0" max="0.2" step="0.001" value="" oninput="$('#N4').html( this.value );">
+						<input class="ranges" title="N4" id="NuclearVariableCost" type="range" min="0" max="0.2" step="0.001" oninput="$('#N4').html( this.value );">
 					</td>
 					<td class="leftborder">Round-trip efficiency<div><span id="H3"></span>%</div><!--storage cost-->
-						<input class="ranges" title="H3" id="PHSEfficiency" type="range" min="1" max="100" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="H3" id="PHSEfficiency" type="range" min="1" max="100" step="1" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td></td>
 					<td class="leftborder">Round-trip efficiency<div><span id="G3"></span>%</div><!--storage cost-->
-						<input class="ranges" title="G3" id="P2GEfficiency" type="range" min="1" max="100" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="G3" id="P2GEfficiency" type="range" min="1" max="100" step="1" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td></td>
 					
-					<tr/>
+				</tr>
+				<tr>
 					
 					<td class="economic">Life span</td>
 					<td class="economic"><div><span id="S5"></span> years</div>
-						<input class="ranges" title="S5" id="SolarLifeSpan" type="range" min="10" max="40" step="1" value="" oninput="$('#S5').html( this.value );">
+						<input class="ranges" title="S5" id="SolarLifeSpan" type="range" min="10" max="40" step="1" oninput="$('#S5').html( this.value );">
 					</td>
 					<td class="economic"><div><span id="W5"></span> years</div>
-						<input class="ranges" title="W5" id="WindLifeSpan" type="range" min="10" max="40" step="1" value="" oninput="$('#W5').html( this.value );">
+						<input class="ranges" title="W5" id="WindLifeSpan" type="range" min="10" max="40" step="1" oninput="$('#W5').html( this.value );">
 					</td>
 					<td class="economic"><div><span id="N5"></span> years</div>
-						<input class="ranges" title="N5" id="NuclearLifeSpan" type="range" min="20" max="100" step="1" value="" oninput="$('#N5').html( this.value );">
+						<input class="ranges" title="N5" id="NuclearLifeSpan" type="range" min="20" max="100" step="1" oninput="$('#N5').html( this.value );">
 					</td>
 					<td class="economic leftborder"><div><span id="H6"></span> years</div>
-						<input class="ranges" title="H6" id="PHSLifeSpan" type="range" min="10" max="100" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="H6" id="PHSLifeSpan" type="range" min="10" max="100" step="1" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td class="economic"></td>
 					<td class="economic leftborder"><div><span id="G6"></span> years</div>
-						<input class="ranges" title="G6" id="P2GLifeSpan" type="range" min="5" max="50" step="1" value="" oninput="$('#'+this.title).html( this.value ); ">
+						<input class="ranges" title="G6" id="P2GLifeSpan" type="range" min="5" max="50" step="1" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td class="economic"></td>
+				</tr>
 				</table>
 				
 				<div id="advancedoption">
@@ -260,10 +266,10 @@
 					<input class='bottone' type="submit" value="save current scenario" onclick="displaySave()"/><input class='bottone' type="submit" value="reset to defaults" onclick="initializeCaps(2)"/>
 					
 					<div id="savePane">
-						<input class="bottoncino" type="text" id="saveScenarioName" placeholder="scenario name"></input>
+						<input class="bottoncino" type="text" id="saveScenarioName" placeholder="scenario name">
 						<textarea id="saveScenarioComment" placeholder="Comments"></textarea>
-						<input class="bottoncino" type="submit" onclick="saveScenario()" value="save"></input>
-						<input class="bottoncino" type="submit" onclick="$('#savePane').css('display','none');" value="close"></input>
+						<input class="bottoncino" type="submit" onclick="saveScenario()" value="save">
+						<input class="bottoncino" type="submit" onclick="$('#savePane').css('display','none');" value="close">
 					</div>
 				</div>
 			</div>
