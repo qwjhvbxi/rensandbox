@@ -133,9 +133,9 @@ function initializeCaps(resetOption) {
 function changeScenario(S,DefaultS) {
 	
 	if (DefaultS==true) {
-		CapChoice=$.extend( {}, CapChoiceOptionsDefault[S] );
+		CapChoice=JSON.parse(JSON.stringify(CapChoiceOptionsDefault[S]));
 	}else {
-		CapChoice=$.extend( {}, CapChoiceOptionsUser[S] );
+		CapChoice=JSON.parse(JSON.stringify(CapChoiceOptionsUser[S]));
 	}
 	
 	localStorage.setItem('LastCapChoice', JSON.stringify(CapChoice));
