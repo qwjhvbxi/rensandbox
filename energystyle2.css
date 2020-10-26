@@ -46,7 +46,7 @@ h1 {
 .dot {
 	height: 70px;
 	width: 70px;
-	background-color: #bbb;
+	/*background-color: #bbb;*/
 	border-radius: 50%;
 	display: inline-block;
 	z-index:90;
@@ -248,6 +248,23 @@ p.description {
 
 /*-------------  RESULTS ----------------*/
 
+#fossilbox .infoItem:hover {
+	cursor:help;
+}
+#fossilbox .infoItem:hover::before {
+	content:"assuming coal & gas mix @700 gCO2/kWh";
+	display:block;
+	background-color:#000;
+	color:white;
+	border:1px solid #000;
+	z-index:1000;
+	position:absolute;
+	top:-45px;
+	padding:3px;
+	width:150px;
+	text-align:center;
+	opacity:0.7;
+}
 #resultsContainer2 {
 	margin:0px 20px 0px -20px;
 	visibility:hidden;
@@ -256,8 +273,12 @@ div.results,div.resultsHeader,div.resultsCosts {
 	position:relative;
 	width:200px;
 	padding:0px;
-	height:30px;
+	min-height:30px;
+	margin:0px 0px 0px 0px;
 	font-size:10pt;
+}
+div.doubleLine {
+	height:40px;
 }
 div.resultsHeader {
 	height:70px;
@@ -313,6 +334,12 @@ div.results span.dot,div.resultsCosts span.dot {
 	text-align:center;
 	border-radius:5px;
 	margin:20px 0px 0px 0px;
+}
+#carbonintensitydot {
+	display:block;
+	background-color: #FF6347;
+	background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,.6) 10px, rgba(255,255,255,.6) 20px);
+	border:1px solid red;
 }
 .Alert .Warn {
 	display:block;

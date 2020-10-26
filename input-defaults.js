@@ -81,6 +81,11 @@ CapChoiceOptionsDefault=[
 			VariableCost:0.1, // $ per kWh
 			LifeSpan:30,
 		},
+		Fossil: {
+			CapitalCost:1000, // $ per kW
+			VariableCost:0.1, // $ per kWh
+			LifeSpan:40,
+		},
 		PHS: { 
 			PowerCapacity:7,
 			StorageCapacity:10,

@@ -3,6 +3,7 @@
 CurrentVersion=0.184;
 ShowRangeSelector=false;
 Simplified=0;
+FossilGen=true;
 colorCodes={
 	Solar:"#aaaa00",
 	Wind:"#00aa33",
@@ -14,8 +15,22 @@ colorCodes={
 	Load:"#333",
 	Unserved:"#ff0000",
 	Surplus:"#9cc",
+	Fossil:"#ff0000",
 }
-
+Emissions={
+	Solar:45,
+	Wind:11,
+	Nuclear:12,
+	Fossil:700,
+	Coal:900,
+	PHS:0,
+	P2G:0,
+}
+Fossil={
+	CapitalCost:1000, // $ per kW
+	VariableCost:0.1, // $ per kWh
+	LifeSpan:40,
+}
 
 function initializeApp() {
 
@@ -38,6 +53,12 @@ function initializeApp() {
 		updateSimplified();
 	});
 	
+	if (FossilGen) {
+		$('#unservedbox').css({display:"none"});
+	} else {
+		$('#fossilbox').css({display:"none"});
+		$('.co2box').css({display:"none"});
+	}
 }
 
 function initializeScenario() {
@@ -374,8 +395,6 @@ function generateLoad() {
 		Unserved[i]=Math.max(0,Load[i]-Generation[i]-phsPower[i]-p2gPower[i]);
 		
 		// setup graph variables
-		PowerLabels=[ "Date", "Solar","Wind","Nuclear","Load","PHS","P2G"];
-		PowerColors=[ colorCodes.Solar,colorCodes.Wind,colorCodes.Nuclear,colorCodes.Load,colorCodes.PHS,colorCodes.P2G]
 		PowerData[i]=[];
 		PowerData[i][0]=ThisData[i][0];
 		PowerData[i][1]=Solar[i];
@@ -384,10 +403,11 @@ function generateLoad() {
 		PowerData[i][4]=Load[i];
 		PowerData[i][5]=phsPower[i];
 		PowerData[i][6]=p2gPower[i];
+		if (FossilGen) {
+			PowerData[i][7]=Unserved[i];
+		}
 		
 		// setup stacked graph variables
-		PowerStackedLabels=[ "Date","Unserved","P2G","PHS","Solar","Wind","Nuclear"];
-		PowerStackedColors=[ colorCodes.Unserved,colorCodes.P2G,colorCodes.PHS,colorCodes.Solar,colorCodes.Wind,colorCodes.Nuclear];
 		PowerDataStacked[i]=[];
 		PowerDataStacked[i][0]=ThisData[i][0];
 		PowerDataStacked[i][1]=Unserved[i];
@@ -398,14 +418,21 @@ function generateLoad() {
 		PowerDataStacked[i][6]=Nuclear[i];
 		
 		// setup storage graph variables
-		StorageLabels=[ "Date", "PHS storage", "P2G storage"];
-		StorageColors=[colorCodes.PHS,colorCodes.P2G];
 		StorageData[i]=[];
 		StorageData[i][0]=ThisData[i][0];
 		StorageData[i][1]=phsStorage[i];
 		StorageData[i][2]=p2gStorage[i];
 		
 	}
+	
+	PowerLabels=[ "Date", "Solar","Wind","Nuclear","Load","PHS","P2G"];
+	PowerColors=[ colorCodes.Solar,colorCodes.Wind,colorCodes.Nuclear,colorCodes.Load,colorCodes.PHS,colorCodes.P2G]
+	
+	PowerStackedLabels=[ "Date","Unserved","P2G","PHS","Solar","Wind","Nuclear"];
+	PowerStackedColors=[ colorCodes.Unserved,colorCodes.P2G,colorCodes.PHS,colorCodes.Solar,colorCodes.Wind,colorCodes.Nuclear];
+
+	StorageLabels=[ "Date", "PHS storage", "P2G storage"];
+	StorageColors=[colorCodes.PHS,colorCodes.P2G];
 	
 	// calculate totals
 	Total=[];
@@ -415,8 +442,14 @@ function generateLoad() {
 	Total.Nuclear=Nuclear.reduce(sumFun);
 	Total.P2G=p2gPowerGen.reduce(sumFun);
 	Total.PHS=phsPowerGen.reduce(sumFun);
-	Total.Unserved=Unserved.reduce(sumFun);
 	Total.Surplus=Surplus.reduce(sumFun);
+	if (FossilGen) {
+		Total.Fossil=Unserved.reduce(sumFun);
+		Total.Unserved=0;	
+	} else {
+		Total.Fossil=0;
+		Total.Unserved=Unserved.reduce(sumFun);
+	}
 	
 	// calculate peaks
 	Peak=[];
@@ -428,6 +461,7 @@ function generateLoad() {
 	Peak.PHS=Math.max.apply(Math, phsPower);
 	Peak.Unserved=Math.max.apply(Math, Unserved);
 	Peak.Surplus=Math.max.apply(Math, Surplus);
+	Peak.Fossil=Math.max.apply(Math, Unserved);
 	
 	// costs
 	VariableCost=CapChoice.Nuclear.VariableCost*Total.Nuclear/HR;
@@ -440,6 +474,20 @@ function generateLoad() {
 	SolarDemandPerc=Total.Solar/CapChoice.Solar.PowerCapacity/Total.Load*100;
 	WindDemandPerc=Total.Wind/CapChoice.Wind.PowerCapacity/Total.Load*100;
 	NuclearDemandPerc=1/(Total.Load/Load.length)*100;
+	
+	// emissions
+	TotEmissions=(Total.Solar*Emissions.Solar+Total.Wind*Emissions.Wind+Total.Nuclear*Emissions.Nuclear+Total.Fossil*Emissions.Fossil);
+	
+	
+	if (FossilGen) {
+		PowerLabels[7]="Fossil";
+		PowerColors[6]=colorCodes.Unserved;
+		PowerStackedLabels[1]="Fossil";	
+		
+		CapitalCost+=Peak.Fossil*Fossil.CapitalCost/Fossil.LifeSpan;
+		VariableCost+=Fossil.VariableCost*Total.Fossil/HR;
+	}
+	
 	
 	// update ranges with demand percentages
 	updateRanges();
@@ -458,8 +506,14 @@ function generateLoad() {
 	$("#costperkwh").html((Math.round((CapitalCost+VariableCost)/((Total.Load-Total.Unserved)/HR)*100)/100).toFixed(2))
 	$("#costperkwhdot").css("transform","scale("+Math.sqrt(((CapitalCost+VariableCost)/((Total.Load-Total.Unserved)/HR))/(0.2))+")");
 	
+	$("#carbontotal").html((Math.round(TotEmissions/HR/1000000*100)/100).toFixed(1))
+	//$("#carbontotaldot").css("transform","scale("+Math.sqrt((TotEmissions/HR/1000000)/(100))+")");
+	$("#carbonintensity").html((Math.round(TotEmissions/Total.Load)))
+	$("#carbonintensitydot").css("transform","scale("+Math.sqrt((TotEmissions/Total.Load)/(250))+")");
+	
+	
 	// add red text and warning if there is unserved demand
-	if (Total.Unserved>0) {
+	if (Total.Unserved>0 && !FossilGen) {
 		$("#resultsContainer2").addClass("Alert");
 	}else{
 		$("#resultsContainer2").removeClass("Alert");
@@ -500,6 +554,7 @@ function drawCharts() {
 		interactionModel: Dygraph.defaultInteractionModel,
 		rangeSelectorHeight: 30,
 		maxNumberWidth: 20,
+		digitsAfterDecimal: 1,
 		stackedGraph: UserOptions.Stacked,
 		height:250,//320,
 		labelsDiv:'powerlabels',
@@ -795,6 +850,19 @@ function displayPie() {
 					
 	var totale=data1.reduce(sumFun);
 	
+	if (FossilGen) {
+		Unslab="Fossil";
+	} else{
+		Unslab="Unserved";
+	}
+	var Labels=[
+				'Direct ('+(Math.round(data1[0]/totale*1000)/10)+'%)',
+				'PHS ('+(Math.round(data1[1]/totale*1000)/10)+'%)',
+				'P2G ('+(Math.round(data1[2]/totale*1000)/10)+'%)',
+				Unslab+' ('+(Math.round(data1[3]/totale*1000)/10)+'%)'
+				// CAMBIA PER EMISSIONS !!!
+			]
+	
 	var ctx = document.getElementById('energysources').getContext('2d');
 	var chart = new Chart(ctx, {
 		type: 'pie',
@@ -809,12 +877,7 @@ function displayPie() {
 				],
 				label: 'Dataset 1'
 			}],
-			labels: [
-				'Direct ('+(Math.round(data1[0]/totale*1000)/10)+'%)',
-				'PHS ('+(Math.round(data1[1]/totale*1000)/10)+'%)',
-				'P2G ('+(Math.round(data1[2]/totale*1000)/10)+'%)',
-				'Unserved ('+(Math.round(data1[3]/totale*1000)/10)+'%)'
-			]
+			labels: Labels
 		},
 		options: {
 			responsive: true,

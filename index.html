@@ -61,16 +61,26 @@
 				<div class="results" title="P2G"></div>
 				<div class="results" title="PHS"></div>
 				<div class="results" id="unservedbox" title="Unserved"></div>
+				<div class="results" id="fossilbox" title="Fossil"></div>
 				<div class="results" title="Surplus"></div>
 				<hr/>
 				<div class="resultsCosts">
 					<div class='infoItem'>Cost/year:</div>
 					<div class="infoNumbers"> &euro; <span id="costperyear">...</span> billion </div>
 				</div>
-				<div class="resultsCosts">							
+				<div class="resultsCosts doubleLine">							
 					<div class='infoItem'>Cost per kWh:</div>
 					<span class='dot' id="costperkwhdot" style="background-color:#FF7F50"></span>
 					<div class="infoNumbers"> &euro; <span id="costperkwh">...</span></div>
+				</div>
+				<div class="resultsCosts co2box doubleLine">							
+					<div class='infoItem'>Emissions per year:</div>
+					<div class="infoNumbers"><span id="carbontotal">...</span> Mt<sub>CO2</sub> </div>
+				</div>
+				<div class="resultsCosts co2box doubleLine">							
+					<div class='infoItem'>Carbon intensity:</div>
+					<span class='dot' id="carbonintensitydot"></span>
+					<div class="infoNumbers"><span id="carbonintensity">...</span> g<sub>CO2</sub>/kWh </div>
 				</div>
 				<div class="Warn">Warning! Blackouts!</div>
 			</div>
