@@ -27,8 +27,9 @@
 	<script src="utils/Chart.min.js"></script>
 	
 	<script src="input-defaults.js"></script>
+	<script src="settings.js"></script>
 	<script src="general-tools.js"></script>
-	<script src="general-functions.js"></script>
+	<script src="rensandbox.js"></script>
 	
 	<script id="MathJax-script" async  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
@@ -60,6 +61,7 @@
 				<div class="results" title="Nuclear"></div>	
 				<div class="results" title="P2G"></div>
 				<div class="results" title="PHS"></div>
+				<div class="results" title="Batteries"></div>
 				<div class="results" id="unservedbox" title="Unserved"></div>
 				<div class="results" id="fossilbox" title="Fossil"></div>
 				<div class="results" title="Surplus"></div>
@@ -104,7 +106,7 @@
 				<tr>
 					<td></td>
 					<td colspan=3><h2>Generation</h2></td>
-					<td colspan=4><h2>Storage</h2></td>
+					<td colspan=6><h2>Storage</h2></td>
 				</tr>
 				<tr>
 					<th style="width:100px"></th>
@@ -113,6 +115,7 @@
 					<th>Nuclear</th>
 					<th colspan=2 class="leftborder"><abbr title="Pumped hydro storage"><a target="_blank" href="https://en.wikipedia.org/wiki/Pumped-storage_hydroelectricity">PHS</a></abbr></th>
 					<th colspan=2 class="leftborder"><abbr title="Power2gas"><a target="_blank" href="https://en.wikipedia.org/wiki/Power-to-gas">P2G</a></abbr></th>
+					<th colspan=2 class="leftborder">Batteries</th>
 					
 				</tr>
 				<tr>
@@ -148,11 +151,19 @@
 					<td>Storage<div><span id="H2"></span> GWh</div>
 						<input class="ranges" title="H2" id="PHSStorageCapacity" type="range" min="0" max="50" step="1" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
+
 					<td class="leftborder">Power<div><span id="G1"></span> GW</div>
 						<input class="ranges" title="G1" id="P2GPowerCapacity" type="range" min="0" max="100" step="1" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td>Storage<div><span id="G2"></span> GWh</div>
 						<input class="ranges" title="G2" id="P2GStorageCapacity" type="range" min="0" max="100000" step="100" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+
+					<td class="leftborder">Power<div><span id="B1"></span> GW</div>
+						<input class="ranges" title="B1" id="BatteriesPowerCapacity" type="range" min="0" max="100" step="1" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td>Storage<div><span id="B2"></span> GWh</div>
+						<input class="ranges" title="B2" id="BatteriesStorageCapacity" type="range" min="0" max="100000" step="100" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					
 					
@@ -218,6 +229,12 @@
 					<td class="economic">Storage<div><span id="G5"></span> $/kWh</div>
 						<input class="ranges" title="G5" id="P2GCapitalCostStorage" type="range" min="0" max="200" step="5" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
+					<td class="economic leftborder">Power<div><span id="B4"></span> $/kW</div>
+						<input class="ranges" title="B4" id="BatteriesCapitalCost" type="range" min="10" max="10000" step="10" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td class="economic">Storage<div><span id="B5"></span> $/kWh</div>
+						<input class="ranges" title="B5" id="BatteriesCapitalCostStorage" type="range" min="0" max="200" step="5" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
 					
 				</tr>
 				<tr>
@@ -240,6 +257,10 @@
 						<input class="ranges" title="G3" id="P2GEfficiency" type="range" min="1" max="100" step="1" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td></td>
+					<td class="leftborder">Round-trip efficiency<div><span id="B3"></span>%</div><!--storage cost-->
+						<input class="ranges" title="B3" id="BatteriesEfficiency" type="range" min="1" max="100" step="1" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td></td>
 					
 				</tr>
 				<tr>
@@ -260,6 +281,10 @@
 					<td class="economic"></td>
 					<td class="economic leftborder"><div><span id="G6"></span> years</div>
 						<input class="ranges" title="G6" id="P2GLifeSpan" type="range" min="5" max="50" step="1" oninput="$('#'+this.title).html( this.value ); ">
+					</td>
+					<td class="economic"></td>
+					<td class="economic leftborder"><div><span id="B6"></span> years</div>
+						<input class="ranges" title="B6" id="BatteriesLifeSpan" type="range" min="5" max="20" step="1" oninput="$('#'+this.title).html( this.value ); ">
 					</td>
 					<td class="economic"></td>
 				</tr>

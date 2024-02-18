@@ -12,7 +12,7 @@ body {
 	font-size:12pt;
 }
 #container {
-	width:1100px;
+	width:1200px;
 	margin:auto;
 }
 #header {
@@ -73,7 +73,7 @@ input {
 	display:flex;
 }
 #graphsContainer {
-	width:900px;
+	width:1000px;
 	display:block;
 	position:relative;
 }
@@ -202,7 +202,7 @@ abbr a {
 	color:#666;
 }
 input[type=range] {
-	width:130px;
+	width:100px;
 	
 }
 

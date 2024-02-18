@@ -1,36 +1,4 @@
 
-// general info
-CurrentVersion=0.184;
-ShowRangeSelector=false;
-Simplified=0;
-FossilGen=true;
-colorCodes={
-	Solar:"#aaaa00",
-	Wind:"#00aa33",
-	Nuclear:"#FF7F00",
-	Coal:"#630",
-	PHS:"#6677ff",
-	P2G:"#456789",
-	Direct:"#00FA9A",
-	Load:"#333",
-	Unserved:"#ff0000",
-	Surplus:"#9cc",
-	Fossil:"#ff0000",
-}
-Emissions={
-	Solar:45,
-	Wind:11,
-	Nuclear:12,
-	Fossil:700,
-	Coal:900,
-	PHS:0,
-	P2G:0,
-}
-Fossil={
-	CapitalCost:1000, // $ per kW
-	VariableCost:0.1, // $ per kWh
-	LifeSpan:40,
-}
 
 function initializeApp() {
 
@@ -352,6 +320,9 @@ function generateLoad() {
 	p2gPower=[];
 	p2gPowerGen=[];
 	p2gStorage=[];
+	batteriesPower=[];
+	batteriesPowerGen=[];
+	batteriesStorage=[];
 	
 	// calculate capital costs
 	CapitalCost=CapChoice.Nuclear.CapitalCost*CapChoice.Nuclear.PowerCapacity/CapChoice.Nuclear.LifeSpan;
@@ -359,10 +330,12 @@ function generateLoad() {
 	CapitalCost+=CapChoice.Wind.CapitalCost*CapChoice.Wind.PowerCapacity/CapChoice.Wind.LifeSpan;
 	CapitalCost+=(CapChoice.PHS.CapitalCost*CapChoice.PHS.PowerCapacity+CapChoice.PHS.CapitalCostStorage*CapChoice.PHS.StorageCapacity)/CapChoice.PHS.LifeSpan;
 	CapitalCost+=(CapChoice.P2G.CapitalCost*CapChoice.P2G.PowerCapacity+CapChoice.P2G.CapitalCostStorage*CapChoice.P2G.StorageCapacity)/CapChoice.P2G.LifeSpan;	
+	CapitalCost+=(CapChoice.Batteries.CapitalCost*CapChoice.Batteries.PowerCapacity+CapChoice.Batteries.CapitalCostStorage*CapChoice.Batteries.StorageCapacity)/CapChoice.Batteries.LifeSpan;	
 	
 	// set initial storage level
 	phsStorage[0]=CapChoice.PHS.StorageCapacity/2;
 	p2gStorage[0]=CapChoice.P2G.StorageCapacity/2;
+	batteriesStorage[0]=CapChoice.Batteries.StorageCapacity/2;
 			
 	for (i=0,itot=ThisData.length;i<itot;i++) {
 		
@@ -375,6 +348,8 @@ function generateLoad() {
 		phsPowerLow=Math.max(phsStorage[i]-CapChoice.PHS.StorageCapacity,-CapChoice.PHS.PowerCapacity) // storage
 		p2gPowerHigh=Math.min(p2gStorage[i]*(CapChoice.P2G.Efficiency/100),CapChoice.P2G.PowerCapacity); // generation
 		p2gPowerLow=Math.max(p2gStorage[i]-CapChoice.P2G.StorageCapacity,-CapChoice.P2G.PowerCapacity) // storage
+		batteriesPowerHigh=Math.min(batteriesStorage[i]*(CapChoice.Batteries.Efficiency/100),CapChoice.Batteries.PowerCapacity); // generation
+		batteriesPowerLow=Math.max(batteriesStorage[i]-CapChoice.Batteries.StorageCapacity,-CapChoice.Batteries.PowerCapacity) // storage
 		
 		// nuclear generation
 		Nuclear[i]=Math.max(0,Math.min(Load[i]-phsPowerLow-p2gPowerLow-Solar[i]-Wind[i],CapChoice.Nuclear.PowerCapacity));
@@ -391,8 +366,12 @@ function generateLoad() {
 		p2gPowerGen[i]=Math.max(0,p2gPower[i]);
 		p2gStorage[i+1]=Math.max(0,p2gStorage[i]-p2gPowerGen[i]/(CapChoice.P2G.Efficiency/100)-Math.min(0,p2gPower[i]));
 		
-		Surplus[i]=Math.max(0,-Load[i]+Generation[i]+phsPower[i]+p2gPower[i]);
-		Unserved[i]=Math.max(0,Load[i]-Generation[i]-phsPower[i]-p2gPower[i]);
+		batteriesPower[i]=Math.max(batteriesPowerLow,Math.min(batteriesPowerHigh,Load[i]-Generation[i]-phsPower[i]));
+		batteriesPowerGen[i]=Math.max(0,batteriesPower[i]);
+		batteriesStorage[i+1]=Math.max(0,batteriesStorage[i]-batteriesPowerGen[i]/(CapChoice.Batteries.Efficiency/100)-Math.min(0,batteriesPower[i]));
+		
+		Surplus[i]=Math.max(0,-Load[i]+Generation[i]+phsPower[i]+p2gPower[i]+batteriesPower[i]);
+		Unserved[i]=Math.max(0,Load[i]-Generation[i]-phsPower[i]-p2gPower[i]-batteriesPower[i]);
 		
 		// setup graph variables
 		PowerData[i]=[];
@@ -403,6 +382,7 @@ function generateLoad() {
 		PowerData[i][4]=Load[i];
 		PowerData[i][5]=phsPower[i];
 		PowerData[i][6]=p2gPower[i];
+		PowerData[i][7]=batteriesPower[i];
 		if (FossilGen) {
 			PowerData[i][7]=Unserved[i];
 		}
@@ -413,26 +393,30 @@ function generateLoad() {
 		PowerDataStacked[i][1]=Unserved[i];
 		PowerDataStacked[i][2]=p2gPowerGen[i];
 		PowerDataStacked[i][3]=phsPowerGen[i];
-		PowerDataStacked[i][4]=Solar[i];
-		PowerDataStacked[i][5]=Wind[i];
-		PowerDataStacked[i][6]=Nuclear[i];
+		PowerDataStacked[i][4]=batteriesPowerGen[i];
+		PowerDataStacked[i][5]=Solar[i];
+		PowerDataStacked[i][6]=Wind[i];
+		PowerDataStacked[i][7]=Nuclear[i];
 		
 		// setup storage graph variables
 		StorageData[i]=[];
 		StorageData[i][0]=ThisData[i][0];
 		StorageData[i][1]=phsStorage[i];
 		StorageData[i][2]=p2gStorage[i];
+		StorageData[i][3]=batteriesStorage[i];
 		
 	}
-	
-	PowerLabels=[ "Date", "Solar","Wind","Nuclear","Load","PHS","P2G"];
-	PowerColors=[ colorCodes.Solar,colorCodes.Wind,colorCodes.Nuclear,colorCodes.Load,colorCodes.PHS,colorCodes.P2G]
-	
-	PowerStackedLabels=[ "Date","Unserved","P2G","PHS","Solar","Wind","Nuclear"];
-	PowerStackedColors=[ colorCodes.Unserved,colorCodes.P2G,colorCodes.PHS,colorCodes.Solar,colorCodes.Wind,colorCodes.Nuclear];
 
-	StorageLabels=[ "Date", "PHS storage", "P2G storage"];
-	StorageColors=[colorCodes.PHS,colorCodes.P2G];
+	// TOBE CONTINUED ...
+	
+	PowerLabels=[ "Date", "Solar","Wind","Nuclear","Load","PHS","P2G","Batteries"];
+	PowerColors=[ colorCodes.Solar,colorCodes.Wind,colorCodes.Nuclear,colorCodes.Load,colorCodes.PHS,colorCodes.P2G,colorCodes.Batteries]
+	
+	PowerStackedLabels=[ "Date","Unserved","P2G","PHS","Batteries","Solar","Wind","Nuclear"];
+	PowerStackedColors=[ colorCodes.Unserved,colorCodes.P2G,colorCodes.PHS,colorCodes.Batteries,colorCodes.Solar,colorCodes.Wind,colorCodes.Nuclear];
+
+	StorageLabels=[ "Date", "PHS storage", "P2G storage", "Batteries"];
+	StorageColors=[colorCodes.PHS,colorCodes.P2G,colorCodes.Batteries];
 	
 	// calculate totals
 	Total=[];
@@ -442,6 +426,7 @@ function generateLoad() {
 	Total.Nuclear=Nuclear.reduce(sumFun);
 	Total.P2G=p2gPowerGen.reduce(sumFun);
 	Total.PHS=phsPowerGen.reduce(sumFun);
+	Total.Batteries=batteriesPowerGen.reduce(sumFun);
 	Total.Surplus=Surplus.reduce(sumFun);
 	if (FossilGen) {
 		Total.Fossil=Unserved.reduce(sumFun);
@@ -459,6 +444,7 @@ function generateLoad() {
 	Peak.Nuclear=Math.max.apply(Math, Nuclear);
 	Peak.P2G=Math.max.apply(Math, p2gPower);
 	Peak.PHS=Math.max.apply(Math, phsPower);
+	Peak.Batteries=Math.max.apply(Math, batteriesPower);
 	Peak.Unserved=Math.max.apply(Math, Unserved);
 	Peak.Surplus=Math.max.apply(Math, Surplus);
 	Peak.Fossil=Math.max.apply(Math, Unserved);
@@ -469,6 +455,7 @@ function generateLoad() {
 	VariableCost+=CapChoice.Wind.VariableCost*Total.Wind/HR;
 	VariableCost+=CapChoice.PHS.VariableCost*Total.PHS/HR;
 	VariableCost+=CapChoice.P2G.VariableCost*Total.P2G/HR;	
+	VariableCost+=CapChoice.Batteries.VariableCost*Total.Batteries/HR;
 	
 	// amount of % for each additional GW
 	SolarDemandPerc=Total.Solar/CapChoice.Solar.PowerCapacity/Total.Load*100;

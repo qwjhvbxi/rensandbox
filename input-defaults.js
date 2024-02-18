@@ -18,16 +18,18 @@ Scenarios=[
 		FileName:'Germany_2015',
 		Active:true,
 		PHSPowerCapacity:[0,10,1],
-		PHSStorageCapacity:[0,50,1],
+		PHSStorageCapacity:[0,100,1],
 		P2GStorageCapacity:[0,100000,100],
+		BatteriesStorageCapacity:[0,1000,100],
 	},
 	{
 		Name:'Japan (2018)',
 		FileName:'Japan_2018',
 		Active:true,
 		PHSPowerCapacity:[0,30,1],
-		PHSStorageCapacity:[0,100,1],
+		PHSStorageCapacity:[0,200,1],
 		P2GStorageCapacity:[0,200000,100],
+		BatteriesStorageCapacity:[0,2000,100],
 	},
 	{
 		Name:'Italy (2019)',
@@ -36,6 +38,7 @@ Scenarios=[
 		PHSPowerCapacity:[0,5,1],
 		PHSStorageCapacity:[0,20,1],
 		P2GStorageCapacity:[0,100000,100],
+		BatteriesStorageCapacity:[0,1000,100],
 	},
 ]
 
@@ -99,8 +102,17 @@ CapChoiceOptionsDefault=[
 			PowerCapacity:0,
 			StorageCapacity:0,
 			Efficiency:40,
-			CapitalCost:10000, // $ per kW
+			CapitalCost:1000, // $ per kW
 			CapitalCostStorage:50, // $ per kWh
+			VariableCost:0, // $ per kWh
+			LifeSpan:10,
+		},
+		Batteries: {
+			PowerCapacity:0,
+			StorageCapacity:0,
+			Efficiency:90,
+			CapitalCost:100, // $ per kW
+			CapitalCostStorage:100, // $ per kWh
 			VariableCost:0, // $ per kWh
 			LifeSpan:10,
 		},
@@ -162,6 +174,15 @@ CapChoiceOptionsDefault=[
 			VariableCost:0, // $ per kWh
 			LifeSpan:10,
 		},
+		Batteries: {
+			PowerCapacity:0,
+			StorageCapacity:0,
+			Efficiency:90,
+			CapitalCost:100, // $ per kW
+			CapitalCostStorage:100, // $ per kWh
+			VariableCost:0, // $ per kWh
+			LifeSpan:10,
+		},
 	},
 	{
 		ScenarioName:'Japan (2018)',
@@ -202,6 +223,15 @@ CapChoiceOptionsDefault=[
 			VariableCost:0, // $ per kWh
 			LifeSpan:10,
 		},
+		Batteries: {
+			PowerCapacity:0,
+			StorageCapacity:0,
+			Efficiency:90,
+			CapitalCost:100, // $ per kW
+			CapitalCostStorage:100, // $ per kWh
+			VariableCost:0, // $ per kWh
+			LifeSpan:10,
+		},
 	},
 	{
 		ScenarioName:'Italy (2019)',
@@ -239,6 +269,15 @@ CapChoiceOptionsDefault=[
 			Efficiency:40,
 			CapitalCost:10000, // $ per kW
 			CapitalCostStorage:50, // $ per kWh
+			VariableCost:0, // $ per kWh
+			LifeSpan:10,
+		},
+		Batteries: {
+			PowerCapacity:0,
+			StorageCapacity:0,
+			Efficiency:90,
+			CapitalCost:100, // $ per kW
+			CapitalCostStorage:100, // $ per kWh
 			VariableCost:0, // $ per kWh
 			LifeSpan:10,
 		},
